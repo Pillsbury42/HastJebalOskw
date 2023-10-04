@@ -1,4 +1,4 @@
-module github.com/Pillsbury42/HastJebalOskw.git
+module github.com/Pillsbury42/HastJebalOskw/PhysicalTime
 
 go 1.13
 
