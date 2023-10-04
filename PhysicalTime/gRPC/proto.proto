@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+package PhysicalTime;
+
+option go_package = "github.com/Pillsbury42/HastJebalOskw/PhysicalTime";
+
+message AskForTimeMessage {
+  int64 clientId = 1;
+}
+
+message     TimeMessage {
+  string serverName = 1;
+  int64 unixTime = 2;
+}
+service TimeAsk {
+  rpc AskForTime(AskForTimeMessage) returns (TimeMessage);
+}
