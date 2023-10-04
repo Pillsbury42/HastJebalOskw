@@ -1,11 +1,12 @@
 syntax = "proto3";
 
+
 package PhysicalTime;
 
 option go_package = "PhysicalTime/gRPC";
 
 message AskForTimeMessage {
-  int64 clientId = 1;
+  string clientName = 1;
 }
 
 message     TimeMessage {

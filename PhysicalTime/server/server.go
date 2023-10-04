@@ -4,7 +4,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"io"
+	// "io"
 	"log"
 	"net"
 	"os"
@@ -88,7 +88,7 @@ func (s *Server) AskForTime(ctx context.Context, AskForTimeMessage *gRPC.AskForT
 	// increments the value by the amount given in the request,
 	// and returns the new value.
 	s.currentTime = int64(time.Now().Nanosecond())
-	return &gRPC.TimeMessage{ServerName: s.name, NanoSeconds: s.currentTime}, nil
+	return &gRPC.TimeMessage{ServerName: s.name,NanoSeconds: s.currentTime}, nil
 }
 
 // Get preferred outbound ip of this machine
