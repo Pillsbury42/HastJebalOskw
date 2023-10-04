@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package PhysicalTime;
 
-option go_package = "github.com/Pillsbury42/HastJebalOskw/PhysicalTime";
+option go_package = "PhysicalTime/gRPC";
 
 message AskForTimeMessage {
   int64 clientId = 1;

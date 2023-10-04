@@ -12,13 +12,13 @@ import (
 	"time"
 	// this has to be the same as the go.mod module,
 	// followed by the path to the folder the proto file is in.
-	gRPC "github.com/Pillsbury42/HastJebalOskw/PhysicalTime/gRPC"
+	gRPC "getTime/gRPC"
 
 	"google.golang.org/grpc"
 )
 
 type Server struct {
-	gRPC.UnimplementedTemplateServer        // You need this line if you have a server
+	gRPC.UnimplementedTimeAskServer        // You need this line if you have a server. "TimeAsk" should be the equivalent name of your service
 	name                             string // Not required but useful if you want to name your server
 	port                             string // Not required but useful if your server needs to know what port it's listening to
 
@@ -68,7 +68,7 @@ func launchServer() {
 		currentTime: 0, // gives default value, but not sure if it is necessary
 	}
 
-	gRPC.RegisterTemplateServer(grpcServer, server) //Registers the server to the gRPC server.
+	gRPC.RegisterTimeAskServer(grpcServer, server) //Registers the server to the gRPC server.
 
 	log.Printf("Server %s: Listening at %v\n", *serverName, list.Addr())
 
@@ -84,35 +84,11 @@ func (s *Server) AskForTime(ctx context.Context, AskForTimeMessage *gRPC.AskForT
 	// and unlocks the server when the method is done.
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
-
+	
 	// increments the value by the amount given in the request,
 	// and returns the new value.
 	s.currentTime = int64(time.Now().Nanosecond())
-	return &gRPC.TimeMessage{nanoSeconds: s.currentTime}, nil
-}
-
-func (s *Server) SayHi(msgStream gRPC.Template_SayHiServer) error {
-	for {
-		// get the next message from the stream
-		msg, err := msgStream.Recv()
-
-		// the stream is closed so we can exit the loop
-		if err == io.EOF {
-			break
-		}
-		// some other error
-		if err != nil {
-			return err
-		}
-		// log the message
-		log.Printf("Received message from %s: %s", msg.ClientName, msg.Message)
-	}
-
-	// be a nice server and say goodbye to the client :)
-	ack := &gRPC.Farewell{Message: "Goodbye"}
-	msgStream.SendAndClose(ack)
-
-	return nil
+	return &gRPC.TimeMessage{ServerName: s.name, NanoSeconds: s.currentTime}, nil
 }
 
 // Get preferred outbound ip of this machine

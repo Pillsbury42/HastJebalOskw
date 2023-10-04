@@ -4,7 +4,7 @@
 // - protoc             v4.24.3
 // source: gRPC/proto.proto
 
-package PhysicalTime
+package gRPC
 
 import (
 	context "context"
