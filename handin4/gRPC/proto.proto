@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+
+package PhysicalTime;
+
+option go_package = "PhysicalTime/gRPC";
+
+message ElectionMessage {
+  int32 topcnID = 1;
+}
+
+message CoordinatorMessage {
+  int32 coordID= 1;
+}
+
+message EmptyMessage {
+
+}
+
+service Mutex {
+  rpc Election(ElectionMessage) returns (EmptyMessage);
+  rpc Coordinator(CoordinatorMessage) returns (EmptyMessage);
+}
