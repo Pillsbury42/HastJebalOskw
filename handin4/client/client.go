@@ -11,19 +11,18 @@ import (
 	"time"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	gRPC "github.com/Pillsbury42/HastJebalOskw/handin4/gRPC"
 )
+//Clients send Election and Coordination messages to the server, which sends empty messages back. Therefore the server equals the next node in line
 
-gRPC "github.com/Pillsbury42/HastJebalOskw/handin4/gRPC"
-
-"google.golang.org/grpc"
-"google.golang.org/grpc/credentials/insecure"
 // Same principle as in client. Flags allows for user specific arguments/values
 var myName = flag.String("name", "default", "Senders name")
-var myPort = flag.String("server", "5400", "Tcp server")
+var listenPort = flag.String("clientp", "default", "Tcp server")
+var serverPort = flag.String("serverp", "default", "Server port")
 
 var myNode gRPC.MutexClient   //the server
-var myConn *grpc.ClientConn //the server connection
-
+var myConn *grpc.ClientConn //the "server" connection, used to check if the other node is responding and to close the connection
+// The node struct is needed to handle
 type Node struct {
 	gRPC.UnimplementedMutexServer
 	name string
@@ -40,19 +39,21 @@ func main() {
 	// This parses the flags and sets the correct/given corresponding values.
 	flag.Parse()
 	fmt.Println(".:node is starting:.")
-	launchNode()
-	ConnectToNode()
-}
 
-func ConnectToNode() {}
+	//write -clientp <port>  as cmd line arg
+	launchNode()
+
+	//write -serverp <port> as cmd line arg
+	connectToNode()
+}
 
 func launchNode() {
 	//launch
-	log.Printf("Node %s: Attempts to create listener on port %s\n", *myName, *myPort)
+	log.Printf("Node %s: Attempts to create listener on port %s\n", *myName, *listenPort)
 	//create listener
-	list, err := net.Listen("tcp", fmt.Sprintf("localhost:%s", *myPort))
+	list, err := net.Listen("tcp", fmt.Sprintf("localhost:%s", *listenPort))
 	if err != nil {
-		log.Printf("Server %s: Failed to listen on port %s: %v", *myName, *myPort, err)
+		log.Printf("Server %s: Failed to listen on port %s: %v", *myName, *listenPort, err)
 		return
 	}
 	var opts []grpc.ServerOption
@@ -60,8 +61,8 @@ func launchNode() {
 
 	// makes a new server instance using the name and port from the flags.
 	server := &Node{
-		name:        *serverName,
-		port:        *port,
+		name:        *myName,
+		port:        *listenPort,
 		
 	}
 	gRPC.RegisterMutexServer(grpcServer,server)
@@ -72,6 +73,30 @@ func launchNode() {
 	}
 }
 
+func connectToNode() {
+	//dial options
+	//the server is not using TLS, so we use insecure credentials
+	//(should be fine for local testing but not in the real world)
+	opts := []grpc.DialOption{
+		grpc.WithBlock(),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	}
+
+	//dial the server, with the flag "server", to get a connection to it
+	log.Printf("client %s: Attempts to dial on port %s\n", *myName, serverPort)
+	conn, err := grpc.Dial(fmt.Sprintf(":%s", *serverPort), opts...)
+	if err != nil {
+		log.Printf("Fail to Dial : %v", err)
+		return
+	}
+
+	// makes a client from the server connection and saves the connection
+	// and prints whether or not the connection was is READY
+	server = gRPC.NewMutexClient(conn)
+	ServerConn = conn
+	log.Println("the connection is: ", conn.GetState().String())
+}
+
 func (s *Node) Election(ctx context.Context, elmsg ElectionMessage) (*EmptyMessage, error) {
 	voteID:=s.id
 	if (elmsg.topcnID > id) {
@@ -80,27 +105,42 @@ func (s *Node) Election(ctx context.Context, elmsg ElectionMessage) (*EmptyMessa
 		s.voted=true
 		
 			msg := &gRPC.ElectionMessage {
-				topcnID: voteID
+				topcnID: voteID,
 			}
 			ack, _ := client.Election(context.Background(), msg)
 		
 	} else {
 			coordmsg := &gRPC.CoordinatorMessage {
-				coordID = voteID
+				coordID : voteID,
 			}
 			ack, _ := client.Elected(context.Background(), coordmsg)
 		
 		}
 	
 	empty := &gRPC.EmptyMessage{}
-	return (empty, n)
+	return empty
 }
 
 func (s *Node) Elected(ctx context.Context, coordmsg CoordinatorMessage) (*EmptyMessage, error) {
+	if (coordmsg.coordID == id) {}
+
 	
 	empty := &gRPC.EmptyMessage{}
-	return (empty, nil)
+	return empty
 }
 
+// sets the logger to use a log.txt file instead of the console
+func setLog() *os.File {
+	// Clears the log.txt file when a new server is started
+	if err := os.Truncate("serverlog.txt", 0); err != nil {
+		log.Printf("Failed to truncate: %v", err)
+	}
 
-
+	// This connects to the log file/changes the output of the log informaiton to the log.txt file.
+	f, err := os.OpenFile("serverlog.txt", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+	if err != nil {
+		log.Fatalf("error opening file: %v", err)
+	}
+	log.SetOutput(f)
+	return f
+}
