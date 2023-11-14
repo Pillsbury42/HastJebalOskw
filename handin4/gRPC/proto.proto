@@ -5,12 +5,8 @@ package gRPC;
 
 option go_package = "github.com/Pillsbury42/HastJebalOskw/handin4/gRPC";
 
-message ElectionMessage {
-  int32 topcnID = 1;
-}
-
-message CoordinatorMessage {
-  int32 coordID= 1;
+message HasTokenMessage {
+  bool token = 1;
 }
 
 message EmptyMessage {
@@ -18,6 +14,5 @@ message EmptyMessage {
 }
 
 service Mutex {
-  rpc Election(ElectionMessage) returns (EmptyMessage);
-  rpc Coordinator(CoordinatorMessage) returns (EmptyMessage);
+  rpc HasToken(HasTokenMessage) returns (EmptyMessage); 
 }

@@ -19,16 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Mutex_Election_FullMethodName    = "/gRPC.Mutex/Election"
-	Mutex_Coordinator_FullMethodName = "/gRPC.Mutex/Coordinator"
+	Mutex_HasToken_FullMethodName = "/gRPC.Mutex/HasToken"
 )
 
 // MutexClient is the client API for Mutex service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MutexClient interface {
-	Election(ctx context.Context, in *ElectionMessage, opts ...grpc.CallOption) (*EmptyMessage, error)
-	Coordinator(ctx context.Context, in *CoordinatorMessage, opts ...grpc.CallOption) (*EmptyMessage, error)
+	HasToken(ctx context.Context, in *HasTokenMessage, opts ...grpc.CallOption) (*EmptyMessage, error)
 }
 
 type mutexClient struct {
@@ -39,18 +37,9 @@ func NewMutexClient(cc grpc.ClientConnInterface) MutexClient {
 	return &mutexClient{cc}
 }
 
-func (c *mutexClient) Election(ctx context.Context, in *ElectionMessage, opts ...grpc.CallOption) (*EmptyMessage, error) {
+func (c *mutexClient) HasToken(ctx context.Context, in *HasTokenMessage, opts ...grpc.CallOption) (*EmptyMessage, error) {
 	out := new(EmptyMessage)
-	err := c.cc.Invoke(ctx, Mutex_Election_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *mutexClient) Coordinator(ctx context.Context, in *CoordinatorMessage, opts ...grpc.CallOption) (*EmptyMessage, error) {
-	out := new(EmptyMessage)
-	err := c.cc.Invoke(ctx, Mutex_Coordinator_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, Mutex_HasToken_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -61,8 +50,7 @@ func (c *mutexClient) Coordinator(ctx context.Context, in *CoordinatorMessage, o
 // All implementations must embed UnimplementedMutexServer
 // for forward compatibility
 type MutexServer interface {
-	Election(context.Context, *ElectionMessage) (*EmptyMessage, error)
-	Coordinator(context.Context, *CoordinatorMessage) (*EmptyMessage, error)
+	HasToken(context.Context, *HasTokenMessage) (*EmptyMessage, error)
 	mustEmbedUnimplementedMutexServer()
 }
 
@@ -70,11 +58,8 @@ type MutexServer interface {
 type UnimplementedMutexServer struct {
 }
 
-func (UnimplementedMutexServer) Election(context.Context, *ElectionMessage) (*EmptyMessage, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Election not implemented")
-}
-func (UnimplementedMutexServer) Coordinator(context.Context, *CoordinatorMessage) (*EmptyMessage, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Coordinator not implemented")
+func (UnimplementedMutexServer) HasToken(context.Context, *HasTokenMessage) (*EmptyMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method HasToken not implemented")
 }
 func (UnimplementedMutexServer) mustEmbedUnimplementedMutexServer() {}
 
@@ -89,38 +74,20 @@ func RegisterMutexServer(s grpc.ServiceRegistrar, srv MutexServer) {
 	s.RegisterService(&Mutex_ServiceDesc, srv)
 }
 
-func _Mutex_Election_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ElectionMessage)
+func _Mutex_HasToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(HasTokenMessage)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MutexServer).Election(ctx, in)
+		return srv.(MutexServer).HasToken(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Mutex_Election_FullMethodName,
+		FullMethod: Mutex_HasToken_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MutexServer).Election(ctx, req.(*ElectionMessage))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Mutex_Coordinator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CoordinatorMessage)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(MutexServer).Coordinator(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Mutex_Coordinator_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MutexServer).Coordinator(ctx, req.(*CoordinatorMessage))
+		return srv.(MutexServer).HasToken(ctx, req.(*HasTokenMessage))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -133,12 +100,8 @@ var Mutex_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*MutexServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "Election",
-			Handler:    _Mutex_Election_Handler,
-		},
-		{
-			MethodName: "Coordinator",
-			Handler:    _Mutex_Coordinator_Handler,
+			MethodName: "HasToken",
+			Handler:    _Mutex_HasToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
