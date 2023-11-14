@@ -1,9 +1,9 @@
 syntax = "proto3";
 
 
-package PhysicalTime;
+package gRPC;
 
-option go_package = "PhysicalTime/gRPC";
+option go_package = "github.com/Pillsbury42/HastJebalOskw/handin4/gRPC";
 
 message ElectionMessage {
   int32 topcnID = 1;
