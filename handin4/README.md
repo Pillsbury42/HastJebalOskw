@@ -6,4 +6,15 @@ One of the nodes must start the circulation of the token. Therefore another flag
 
 -hastoken true
 
+example set up:
+
+terminal 1
+> go run node.go -name hanna -clientp 5400 -serverp 5401
+
+terminal 2
+> go run node.go -name oskar -clientp 5401 -serverp 5402
+
+terminal 3
+> go run node.go -name jeppe -clientp 5402 -serverp 5400 -hastoken true
+
 To see the process of which node gets access and when, check out the log files generated.

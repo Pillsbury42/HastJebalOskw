@@ -80,7 +80,7 @@ func launchNode() {
 		name:        *myName,
 		port:        *listenPort,
 		nextport:    *serverPort,
-		wantsAccess: false,
+		wantsAccess: (rand.Intn(2) < 1),
 	}
 	gRPC.RegisterMutexServer(grpcServer, meNode)
 	log.Printf("Server %s: Listening at %v\n\n", meNode.name, list.Addr())
