@@ -19,8 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Mutex_Election_FullMethodName    = "/PhysicalTime.Mutex/Election"
-	Mutex_Coordinator_FullMethodName = "/PhysicalTime.Mutex/Coordinator"
+	Mutex_Election_FullMethodName    = "/gRPC.Mutex/Election"
+	Mutex_Coordinator_FullMethodName = "/gRPC.Mutex/Coordinator"
 )
 
 // MutexClient is the client API for Mutex service.
@@ -129,7 +129,7 @@ func _Mutex_Coordinator_Handler(srv interface{}, ctx context.Context, dec func(i
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Mutex_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "PhysicalTime.Mutex",
+	ServiceName: "gRPC.Mutex",
 	HandlerType: (*MutexServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

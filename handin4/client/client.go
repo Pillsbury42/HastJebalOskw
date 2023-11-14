@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net"
 	"os"
 	"strings"
 	"time"
@@ -20,7 +21,11 @@ var myName = flag.String("name", "default", "Senders name")
 var listenPort = flag.String("clientp", "default", "Tcp server")
 var serverPort = flag.String("serverp", "default", "Server port")
 
+<<<<<<< HEAD
+var nextNode gRPC.MutexClient   //the server
+=======
 var myNode gRPC.MutexClient   //the server
+>>>>>>> d0e6741bf395f59cc902b67abdaca541da6ecec5
 var myConn *grpc.ClientConn //the "server" connection, used to check if the other node is responding and to close the connection
 // The node struct is needed to handle
 type Node struct {
@@ -48,6 +53,10 @@ func main() {
 }
 
 func launchNode() {
+	//This is equivalent o the launchServer() method
+	//This creates a listener at this node's port and sets local a Node struct
+	//All nodes are servers and clients
+	
 	//launch
 	log.Printf("Node %s: Attempts to create listener on port %s\n", *myName, *listenPort)
 	//create listener
@@ -60,13 +69,13 @@ func launchNode() {
 	grpcServer := grpc.NewServer(opts...)
 
 	// makes a new server instance using the name and port from the flags.
-	server := &Node{
+	meNode := &Node{
 		name:        *myName,
 		port:        *listenPort,
 		
 	}
-	gRPC.RegisterMutexServer(grpcServer,server)
-	log.Printf("Server %s: Listening at %v\n\n", server.name, list.Addr())
+	gRPC.RegisterMutexServer(grpcServer,meNode)
+	log.Printf("Server %s: Listening at %v\n\n", meNode.name, list.Addr())
 
 	if err := grpcServer.Serve(list); err != nil {
 		log.Fatalf("failed to serve %v", err)
@@ -74,6 +83,9 @@ func launchNode() {
 }
 
 func connectToNode() {
+	//This is equivalent to client's ConnectToServer method
+	//Here, our node dials up the connection to the next node in the ring
+	//If succesful, this sets the next node as "server"
 	//dial options
 	//the server is not using TLS, so we use insecure credentials
 	//(should be fine for local testing but not in the real world)
@@ -83,7 +95,7 @@ func connectToNode() {
 	}
 
 	//dial the server, with the flag "server", to get a connection to it
-	log.Printf("client %s: Attempts to dial on port %s\n", *myName, serverPort)
+	log.Printf("Node %s: Attempts to dial on port %s\n", *myName, serverPort)
 	conn, err := grpc.Dial(fmt.Sprintf(":%s", *serverPort), opts...)
 	if err != nil {
 		log.Printf("Fail to Dial : %v", err)
@@ -92,15 +104,21 @@ func connectToNode() {
 
 	// makes a client from the server connection and saves the connection
 	// and prints whether or not the connection was is READY
-	server = gRPC.NewMutexClient(conn)
+	net = gRPC.NewMutexClient(conn)
 	ServerConn = conn
 	log.Println("the connection is: ", conn.GetState().String())
 }
 
-func (s *Node) Election(ctx context.Context, elmsg ElectionMessage) (*EmptyMessage, error) {
+func (s *Node) Election(ctx context.Context, elmsg gRPC.ElectionMessage) (*gRPC.EmptyMessage, error) {
+	//id is a rank/id 
+	//If voted then we've completed a lap and must start coordination, otherwise:
+	//set voted to true. If own id is higher than message id, send message with own id, otherwise pass on
 	voteID:=s.id
+	
 	if (elmsg.topcnID > id) {
-		voteID=elmsg.topcnID}
+		voteID=elmsg.topcnID
+	}
+	
 	if !s.voted {
 		s.voted=true
 		
@@ -121,10 +139,33 @@ func (s *Node) Election(ctx context.Context, elmsg ElectionMessage) (*EmptyMessa
 	return empty
 }
 
-func (s *Node) Elected(ctx context.Context, coordmsg CoordinatorMessage) (*EmptyMessage, error) {
-	if (coordmsg.coordID == id) {}
-
-	
+func (s *Node) Coordinator(ctx context.Context, coordmsg gRPC.CoordinatorMessage) (*gRPC.EmptyMessage, error) {
+	//If not voted then we've completed a lap and must start a new election, otherwise:
+	//If winner, "go into critical section" and set id to 0. If not winner, increase id by 1.
+	//Finally, set voted to false
+	if !s.voted {
+		msg := &gRPC.ElectionMessage {
+			topcnID: id,
+		}
+		ack, _ := client.Election(context.Background(), msg)
+	} else if (coordmsg.coordID == id) {
+		//This node is the winner. The critical section is accessed.
+		log.Printf("%s is entering critical section", myName)
+		id=0
+		log.Printf("%s has left critical section and is now in back of queue", myName)
+			msg := &gRPC.CoordinatordMessage {
+				coordID: coordmsg.id,
+			}
+			ack, _ := client.Coordinator(context.Background(), msg)
+	} else {
+		//This node is not the winner. Elected() passes a message along to the next node in the circle
+		id++
+		electedMessage := &gRPC.CoordinatorMessage {
+			coordID : coordmsg.id,
+		}
+		ack, _ := client.Coordinator(context.Background(), electedMessage)
+	}
+		
 	empty := &gRPC.EmptyMessage{}
 	return empty
 }
