@@ -8,6 +8,7 @@ import (
 	"math/rand"
 	"net"
 	"os"
+	"time"
 
 	gRPC "github.com/Pillsbury42/HastJebalOskw/handin4/gRPC"
 	"google.golang.org/grpc"
@@ -20,10 +21,11 @@ import (
 var myName = flag.String("name", "default", "This node's name")
 var listenPort = flag.String("clientp", "5400", "receiving port")
 var serverPort = flag.String("serverp", "5401", "sending port")
-var hasToken = flag.String("hastoken", "", "Starts with token")
-
+var hasToken = flag.String("hastoken", "false", "Starts with token")
+var isConnected = false
 var nextNode gRPC.MutexClient //the server
 var nextConn *grpc.ClientConn //the "server" connection, used to check if the other node is responding and to close the connection
+
 // The node struct is needed to handle
 type Node struct {
 	gRPC.UnimplementedMutexServer
@@ -34,25 +36,26 @@ type Node struct {
 }
 
 func main() {
+	flag.Parse()
 	f := setLog() //uncomment this line to log to a log.txt file instead of the console
 	defer f.Close()
 
 	// This parses the flags and sets the correct/given corresponding values.
-	flag.Parse()
+
 	fmt.Println(".:node is starting:.")
 
-	//write -clientp <port>  as cmd line arg
-	launchNode()
-
-	//write -serverp <port> as cmd line arg
-	connectToNode()
+	go launchNode()
 
 	//send the first message if initialized with token
 	if *hasToken == "true" {
+		isConnected = true
+		connectToNode()
 		log.Printf("Starting the token pass\n")
 		nextNode.HasToken(context.Background(), &gRPC.HasTokenMessage{Token: true})
 	} else {
 		log.Printf("I did not start with the token\n")
+	}
+	for true {
 	}
 }
 
@@ -77,12 +80,10 @@ func launchNode() {
 		name:        *myName,
 		port:        *listenPort,
 		nextport:    *serverPort,
-		wantsAccess: (rand.Intn(1) < 1),
+		wantsAccess: false,
 	}
-
 	gRPC.RegisterMutexServer(grpcServer, meNode)
 	log.Printf("Server %s: Listening at %v\n\n", meNode.name, list.Addr())
-
 	if err := grpcServer.Serve(list); err != nil {
 		log.Fatalf("failed to serve %v", err)
 	}
@@ -101,7 +102,7 @@ func connectToNode() {
 	}
 
 	//dial the server, with the flag "server", to get a connection to it
-	log.Printf("Node %s: Attempts to dial on port %d\n", *myName, serverPort)
+	log.Printf("Node %s: Attempts to dial on port %s\n", *myName, *serverPort)
 	conn, err := grpc.Dial(fmt.Sprintf(":%s", *serverPort), opts...)
 	if err != nil {
 		log.Printf("Fail to Dial : %v", err)
@@ -116,9 +117,14 @@ func connectToNode() {
 }
 
 func (s *Node) HasToken(ctx context.Context, msg *gRPC.HasTokenMessage) (*gRPC.EmptyMessage, error) {
+	if !isConnected {
+		connectToNode()
+		isConnected = true
+	}
 	//if the node has the token, it can access the critical section. Otherwise the token is passed on
 	if s.wantsAccess && msg.Token {
 		log.Printf("Node %s has token and wants access. Accessing critical section...\n", s.name)
+		time.Sleep(2 * time.Second)
 		s.wantsAccess = false
 		log.Printf("Node %s has accessed the critical section\n", s.name)
 	} else {
@@ -126,14 +132,15 @@ func (s *Node) HasToken(ctx context.Context, msg *gRPC.HasTokenMessage) (*gRPC.E
 
 	}
 	log.Printf("Node %s has finished and is passing the token on\n", s.name)
-	nextNode.HasToken(context.Background(), msg)
 
-	if rand.Intn(1) < 1 {
+	if rand.Intn(2) < 1 {
 		log.Printf("Node %s wants access\n", s.name)
 		s.wantsAccess = true
 	} else {
 		log.Printf("Node %s does not want access\n", s.name)
 	}
+
+	nextNode.HasToken(context.Background(), msg)
 
 	return &gRPC.EmptyMessage{}, nil
 }

@@ -1,0 +1,73 @@
+2023/11/14 19:16:01 I did not start with the token
+2023/11/14 19:16:01 Node hanna: Attempts to create listener on port 5400
+2023/11/14 19:16:01 Server hanna: Listening at 127.0.0.1:5400
+
+2023/11/14 19:16:02 Node hanna: Attempts to dial on port 5401
+2023/11/14 19:16:02 the connection is: READY 
+2023/11/14 19:16:02 Node hanna has token, but doesn't want access.
+2023/11/14 19:16:02 Node hanna has finished and is passing the token on
+2023/11/14 19:16:02 Node hanna wants access
+2023/11/14 19:16:03 Node hanna has token and wants access. Accessing critical section...
+2023/11/14 19:16:05 Node hanna has accessed the critical section
+2023/11/14 19:16:05 Node hanna has finished and is passing the token on
+2023/11/14 19:16:05 Node hanna wants access
+2023/11/14 19:16:10 Node hanna has token and wants access. Accessing critical section...
+2023/11/14 19:16:12 Node hanna has accessed the critical section
+2023/11/14 19:16:12 Node hanna has finished and is passing the token on
+2023/11/14 19:16:12 Node hanna does not want access
+2023/11/14 19:16:16 Node hanna has token, but doesn't want access.
+2023/11/14 19:16:16 Node hanna has finished and is passing the token on
+2023/11/14 19:16:16 Node hanna wants access
+2023/11/14 19:16:18 Node hanna has token and wants access. Accessing critical section...
+2023/11/14 19:16:20 Node hanna has accessed the critical section
+2023/11/14 19:16:20 Node hanna has finished and is passing the token on
+2023/11/14 19:16:20 Node hanna wants access
+2023/11/14 19:16:20 Node hanna has token and wants access. Accessing critical section...
+2023/11/14 19:16:22 Node hanna has accessed the critical section
+2023/11/14 19:16:22 Node hanna has finished and is passing the token on
+2023/11/14 19:16:22 Node hanna wants access
+2023/11/14 19:16:24 Node hanna has token and wants access. Accessing critical section...
+2023/11/14 19:16:26 Node hanna has accessed the critical section
+2023/11/14 19:16:26 Node hanna has finished and is passing the token on
+2023/11/14 19:16:26 Node hanna wants access
+2023/11/14 19:16:30 Node hanna has token and wants access. Accessing critical section...
+2023/11/14 19:16:32 Node hanna has accessed the critical section
+2023/11/14 19:16:32 Node hanna has finished and is passing the token on
+2023/11/14 19:16:32 Node hanna does not want access
+2023/11/14 19:16:32 Node hanna has token, but doesn't want access.
+2023/11/14 19:16:32 Node hanna has finished and is passing the token on
+2023/11/14 19:16:32 Node hanna wants access
+2023/11/14 19:16:34 Node hanna has token and wants access. Accessing critical section...
+2023/11/14 19:16:36 Node hanna has accessed the critical section
+2023/11/14 19:16:36 Node hanna has finished and is passing the token on
+2023/11/14 19:16:36 Node hanna wants access
+2023/11/14 19:16:40 Node hanna has token and wants access. Accessing critical section...
+2023/11/14 19:16:42 Node hanna has accessed the critical section
+2023/11/14 19:16:42 Node hanna has finished and is passing the token on
+2023/11/14 19:16:42 Node hanna wants access
+2023/11/14 19:16:44 Node hanna has token and wants access. Accessing critical section...
+2023/11/14 19:16:46 Node hanna has accessed the critical section
+2023/11/14 19:16:46 Node hanna has finished and is passing the token on
+2023/11/14 19:16:46 Node hanna does not want access
+2023/11/14 19:16:48 Node hanna has token, but doesn't want access.
+2023/11/14 19:16:48 Node hanna has finished and is passing the token on
+2023/11/14 19:16:48 Node hanna wants access
+2023/11/14 19:16:50 Node hanna has token and wants access. Accessing critical section...
+2023/11/14 19:16:52 Node hanna has accessed the critical section
+2023/11/14 19:16:52 Node hanna has finished and is passing the token on
+2023/11/14 19:16:52 Node hanna wants access
+2023/11/14 19:16:54 Node hanna has token and wants access. Accessing critical section...
+2023/11/14 19:16:56 Node hanna has accessed the critical section
+2023/11/14 19:16:56 Node hanna has finished and is passing the token on
+2023/11/14 19:16:56 Node hanna does not want access
+2023/11/14 19:17:00 Node hanna has token, but doesn't want access.
+2023/11/14 19:17:00 Node hanna has finished and is passing the token on
+2023/11/14 19:17:00 Node hanna wants access
+2023/11/14 19:17:04 Node hanna has token and wants access. Accessing critical section...
+2023/11/14 19:17:06 Node hanna has accessed the critical section
+2023/11/14 19:17:06 Node hanna has finished and is passing the token on
+2023/11/14 19:17:06 Node hanna wants access
+2023/11/14 19:17:10 Node hanna has token and wants access. Accessing critical section...
+2023/11/14 19:17:12 Node hanna has accessed the critical section
+2023/11/14 19:17:12 Node hanna has finished and is passing the token on
+2023/11/14 19:17:12 Node hanna wants access

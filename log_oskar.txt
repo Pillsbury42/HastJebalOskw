@@ -1,0 +1,74 @@
+2023/11/14 19:15:59 I did not start with the token
+2023/11/14 19:15:59 Node oskar: Attempts to create listener on port 5401
+2023/11/14 19:15:59 Server oskar: Listening at 127.0.0.1:5401
+
+2023/11/14 19:16:02 Node oskar: Attempts to dial on port 5402
+2023/11/14 19:16:03 the connection is: READY 
+2023/11/14 19:16:03 Node oskar has token, but doesn't want access.
+2023/11/14 19:16:03 Node oskar has finished and is passing the token on
+2023/11/14 19:16:03 Node oskar wants access
+2023/11/14 19:16:05 Node oskar has token and wants access. Accessing critical section...
+2023/11/14 19:16:07 Node oskar has accessed the critical section
+2023/11/14 19:16:07 Node oskar has finished and is passing the token on
+2023/11/14 19:16:07 Node oskar wants access
+2023/11/14 19:16:12 Node oskar has token and wants access. Accessing critical section...
+2023/11/14 19:16:14 Node oskar has accessed the critical section
+2023/11/14 19:16:14 Node oskar has finished and is passing the token on
+2023/11/14 19:16:14 Node oskar wants access
+2023/11/14 19:16:16 Node oskar has token and wants access. Accessing critical section...
+2023/11/14 19:16:18 Node oskar has accessed the critical section
+2023/11/14 19:16:18 Node oskar has finished and is passing the token on
+2023/11/14 19:16:18 Node oskar does not want access
+2023/11/14 19:16:20 Node oskar has token, but doesn't want access.
+2023/11/14 19:16:20 Node oskar has finished and is passing the token on
+2023/11/14 19:16:20 Node oskar wants access
+2023/11/14 19:16:22 Node oskar has token and wants access. Accessing critical section...
+2023/11/14 19:16:24 Node oskar has accessed the critical section
+2023/11/14 19:16:24 Node oskar has finished and is passing the token on
+2023/11/14 19:16:24 Node oskar wants access
+2023/11/14 19:16:26 Node oskar has token and wants access. Accessing critical section...
+2023/11/14 19:16:28 Node oskar has accessed the critical section
+2023/11/14 19:16:28 Node oskar has finished and is passing the token on
+2023/11/14 19:16:28 Node oskar does not want access
+2023/11/14 19:16:32 Node oskar has token, but doesn't want access.
+2023/11/14 19:16:32 Node oskar has finished and is passing the token on
+2023/11/14 19:16:32 Node oskar wants access
+2023/11/14 19:16:32 Node oskar has token and wants access. Accessing critical section...
+2023/11/14 19:16:34 Node oskar has accessed the critical section
+2023/11/14 19:16:34 Node oskar has finished and is passing the token on
+2023/11/14 19:16:34 Node oskar wants access
+2023/11/14 19:16:36 Node oskar has token and wants access. Accessing critical section...
+2023/11/14 19:16:38 Node oskar has accessed the critical section
+2023/11/14 19:16:38 Node oskar has finished and is passing the token on
+2023/11/14 19:16:38 Node oskar wants access
+2023/11/14 19:16:42 Node oskar has token and wants access. Accessing critical section...
+2023/11/14 19:16:44 Node oskar has accessed the critical section
+2023/11/14 19:16:44 Node oskar has finished and is passing the token on
+2023/11/14 19:16:44 Node oskar wants access
+2023/11/14 19:16:46 Node oskar has token and wants access. Accessing critical section...
+2023/11/14 19:16:48 Node oskar has accessed the critical section
+2023/11/14 19:16:48 Node oskar has finished and is passing the token on
+2023/11/14 19:16:48 Node oskar wants access
+2023/11/14 19:16:48 Node oskar has token and wants access. Accessing critical section...
+2023/11/14 19:16:50 Node oskar has accessed the critical section
+2023/11/14 19:16:50 Node oskar has finished and is passing the token on
+2023/11/14 19:16:50 Node oskar does not want access
+2023/11/14 19:16:52 Node oskar has token, but doesn't want access.
+2023/11/14 19:16:52 Node oskar has finished and is passing the token on
+2023/11/14 19:16:52 Node oskar wants access
+2023/11/14 19:16:56 Node oskar has token and wants access. Accessing critical section...
+2023/11/14 19:16:58 Node oskar has accessed the critical section
+2023/11/14 19:16:58 Node oskar has finished and is passing the token on
+2023/11/14 19:16:58 Node oskar wants access
+2023/11/14 19:17:00 Node oskar has token and wants access. Accessing critical section...
+2023/11/14 19:17:02 Node oskar has accessed the critical section
+2023/11/14 19:17:02 Node oskar has finished and is passing the token on
+2023/11/14 19:17:02 Node oskar wants access
+2023/11/14 19:17:06 Node oskar has token and wants access. Accessing critical section...
+2023/11/14 19:17:08 Node oskar has accessed the critical section
+2023/11/14 19:17:08 Node oskar has finished and is passing the token on
+2023/11/14 19:17:08 Node oskar wants access
+2023/11/14 19:17:12 Node oskar has token and wants access. Accessing critical section...
+2023/11/14 19:17:14 Node oskar has accessed the critical section
+2023/11/14 19:17:14 Node oskar has finished and is passing the token on
+2023/11/14 19:17:14 Node oskar wants access

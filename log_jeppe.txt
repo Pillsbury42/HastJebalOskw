@@ -1,0 +1,69 @@
+2023/11/14 19:16:02 Node jeppe: Attempts to dial on port 5400
+2023/11/14 19:16:02 Node jeppe: Attempts to create listener on port 5402
+2023/11/14 19:16:02 the connection is: READY 
+2023/11/14 19:16:02 Starting the token pass
+2023/11/14 19:16:02 Server jeppe: Listening at 127.0.0.1:5402
+
+2023/11/14 19:16:03 Node jeppe has token, but doesn't want access.
+2023/11/14 19:16:03 Node jeppe has finished and is passing the token on
+2023/11/14 19:16:03 Node jeppe wants access
+2023/11/14 19:16:07 Node jeppe has token and wants access. Accessing critical section...
+2023/11/14 19:16:10 Node jeppe has accessed the critical section
+2023/11/14 19:16:10 Node jeppe has finished and is passing the token on
+2023/11/14 19:16:10 Node jeppe wants access
+2023/11/14 19:16:14 Node jeppe has token and wants access. Accessing critical section...
+2023/11/14 19:16:16 Node jeppe has accessed the critical section
+2023/11/14 19:16:16 Node jeppe has finished and is passing the token on
+2023/11/14 19:16:16 Node jeppe does not want access
+2023/11/14 19:16:18 Node jeppe has token, but doesn't want access.
+2023/11/14 19:16:18 Node jeppe has finished and is passing the token on
+2023/11/14 19:16:18 Node jeppe does not want access
+2023/11/14 19:16:20 Node jeppe has token, but doesn't want access.
+2023/11/14 19:16:20 Node jeppe has finished and is passing the token on
+2023/11/14 19:16:20 Node jeppe does not want access
+2023/11/14 19:16:24 Node jeppe has token, but doesn't want access.
+2023/11/14 19:16:24 Node jeppe has finished and is passing the token on
+2023/11/14 19:16:24 Node jeppe wants access
+2023/11/14 19:16:28 Node jeppe has token and wants access. Accessing critical section...
+2023/11/14 19:16:30 Node jeppe has accessed the critical section
+2023/11/14 19:16:30 Node jeppe has finished and is passing the token on
+2023/11/14 19:16:30 Node jeppe does not want access
+2023/11/14 19:16:32 Node jeppe has token, but doesn't want access.
+2023/11/14 19:16:32 Node jeppe has finished and is passing the token on
+2023/11/14 19:16:32 Node jeppe does not want access
+2023/11/14 19:16:34 Node jeppe has token, but doesn't want access.
+2023/11/14 19:16:34 Node jeppe has finished and is passing the token on
+2023/11/14 19:16:34 Node jeppe wants access
+2023/11/14 19:16:38 Node jeppe has token and wants access. Accessing critical section...
+2023/11/14 19:16:40 Node jeppe has accessed the critical section
+2023/11/14 19:16:40 Node jeppe has finished and is passing the token on
+2023/11/14 19:16:40 Node jeppe does not want access
+2023/11/14 19:16:44 Node jeppe has token, but doesn't want access.
+2023/11/14 19:16:44 Node jeppe has finished and is passing the token on
+2023/11/14 19:16:44 Node jeppe does not want access
+2023/11/14 19:16:48 Node jeppe has token, but doesn't want access.
+2023/11/14 19:16:48 Node jeppe has finished and is passing the token on
+2023/11/14 19:16:48 Node jeppe does not want access
+2023/11/14 19:16:50 Node jeppe has token, but doesn't want access.
+2023/11/14 19:16:50 Node jeppe has finished and is passing the token on
+2023/11/14 19:16:50 Node jeppe wants access
+2023/11/14 19:16:52 Node jeppe has token and wants access. Accessing critical section...
+2023/11/14 19:16:54 Node jeppe has accessed the critical section
+2023/11/14 19:16:54 Node jeppe has finished and is passing the token on
+2023/11/14 19:16:54 Node jeppe wants access
+2023/11/14 19:16:58 Node jeppe has token and wants access. Accessing critical section...
+2023/11/14 19:17:00 Node jeppe has accessed the critical section
+2023/11/14 19:17:00 Node jeppe has finished and is passing the token on
+2023/11/14 19:17:00 Node jeppe wants access
+2023/11/14 19:17:02 Node jeppe has token and wants access. Accessing critical section...
+2023/11/14 19:17:04 Node jeppe has accessed the critical section
+2023/11/14 19:17:04 Node jeppe has finished and is passing the token on
+2023/11/14 19:17:04 Node jeppe wants access
+2023/11/14 19:17:08 Node jeppe has token and wants access. Accessing critical section...
+2023/11/14 19:17:10 Node jeppe has accessed the critical section
+2023/11/14 19:17:10 Node jeppe has finished and is passing the token on
+2023/11/14 19:17:10 Node jeppe wants access
+2023/11/14 19:17:14 Node jeppe has token and wants access. Accessing critical section...
+2023/11/14 19:17:16 Node jeppe has accessed the critical section
+2023/11/14 19:17:16 Node jeppe has finished and is passing the token on
+2023/11/14 19:17:16 Node jeppe does not want access
