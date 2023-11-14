@@ -21,7 +21,11 @@ var myName = flag.String("name", "default", "Senders name")
 var listenPort = flag.String("clientp", "default", "Tcp server")
 var serverPort = flag.String("serverp", "default", "Server port")
 
+<<<<<<< HEAD
 var nextNode gRPC.MutexClient   //the server
+=======
+var myNode gRPC.MutexClient   //the server
+>>>>>>> d0e6741bf395f59cc902b67abdaca541da6ecec5
 var myConn *grpc.ClientConn //the "server" connection, used to check if the other node is responding and to close the connection
 // The node struct is needed to handle
 type Node struct {
@@ -82,6 +86,9 @@ func connectToNode() {
 	//This is equivalent to client's ConnectToServer method
 	//Here, our node dials up the connection to the next node in the ring
 	//If succesful, this sets the next node as "server"
+	//dial options
+	//the server is not using TLS, so we use insecure credentials
+	//(should be fine for local testing but not in the real world)
 	opts := []grpc.DialOption{
 		grpc.WithBlock(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
