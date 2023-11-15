@@ -23,13 +23,22 @@ message ResultReplyMessage {
     int64 winnerID = 2; //id of the winner
     int64 highest = 3; //the highest bid
 }
+
 message ElectionMessage {
 
 }
-message ElectionMessage {
+
+message ElectionReplyMessage {
+    int64 replyID = 1;
+}
+
+message CoordinatorMessage {
+    int64 coordID = 1;
+}
+
+message EmptyMessage {
     
 }
-
 
 service Auction {
   rpc bid(BidMessage) returns (BidReplyMessage);
@@ -39,4 +48,4 @@ service Auction {
 service Bully {
     rpc election(ElectionMessage) returns (ElectionReplyMessage);
     rpc coordinator(CoordinatorMessage) returns (EmptyMessage); 
-  }
+}
