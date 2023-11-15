@@ -1,16 +1,12 @@
-//Server/Node
+// Server/Node
 package main
 
 import (
-	"context"
-	"flag"
 	"fmt"
 
 	// "io"
 	"log"
 	"net"
-	"os"
-	"sync"
 
 	// this has to be the same as the go.mod module,
 	// followed by the path to the folder the proto file is in.
@@ -18,9 +14,10 @@ import (
 
 	"google.golang.org/grpc"
 )
+
 func main() {
-	f := setLog() //uncomment this line to log to a log.txt file instead of the console
-	defer f.Close()
+	//f := setLog()
+	//defer f.Close()
 
 	// This parses the flags and sets the correct/given corresponding values.
 	fmt.Println(".:Node is starting:.")
