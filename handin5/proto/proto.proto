@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+
+package gRPC;
+
+option go_package = "github.com/Pillsbury42/HastJebalOskw/handin5/gRPC";
+
+message BidMessage {
+    int64 bidderID = 1;
+    int64 amount = 2;
+}
+
+message ResultMessage{
+    int64 rmID = 1;
+}
+
+message BidReplyMessage {
+    int64 status = 1; //fail: 1, success: 2, or exception:3
+}
+
+message ResultReplyMessage {
+    bool over = 1; //is auction over?
+    int64 winnerID = 2; //id of the winner
+    int64 highest = 3; //the highest bid
+}
+message ElectionMessage {
+
+}
+message ElectionMessage {
+    
+}
+
+
+service Auction {
+  rpc bid(BidMessage) returns (BidReplyMessage);
+  rpc result(ResultMessage) returns (ResultReplyMessage);
+}
+
+service Bully {
+    rpc election(ElectionMessage) returns (ElectionReplyMessage);
+    rpc coordinator(CoordinatorMessage) returns (EmptyMessage); 
+  }
