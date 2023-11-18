@@ -5,9 +5,10 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"os"
+	"regexp"
+	"strconv"
 
 	//"strconv"
 	"strings"
@@ -48,7 +49,7 @@ func main() {
 
 	go bid(ctx, msg)
 
-	//start the biding
+	//start the bidding
 	parseInput()
 }
 
@@ -74,7 +75,7 @@ func ConnectToServer() {
 	//fmt.Printf("Error here")
 	// makes a client from the server connection and saves the connection
 	// and prints rather or not the connection was is READY
-	server = gRPC.NewChittyChatClient(conn)
+	server = gRPC.NewAuctionClient(conn)
 	ServerConn = conn
 	log.Println("the connection is: ", conn.GetState().String())
 }
@@ -93,7 +94,7 @@ func parseInput() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		input = strings.TrimSpace(input) //Trim input
+	//input = strings.TrimSpace(input) //Trim input
 
 		if !conReady(server) {
 			log.Printf("Client %s: something was wrong with the connection to the server :(", *clientsName)
@@ -101,10 +102,19 @@ func parseInput() {
 		}
 
 		//terminal input parsing here
-
+		matchresult, err := regexp.MatchString("bid (\\d+)", input)
 		if (input == "result"){
-
-		} else if ()
+			fmt.Printf("Getting result...")
+			result()
+		} else if (matchresult){
+			fmt.Printf("Processing bid...")
+			var splitinput = strings.Split(input, " ")
+			inputint, _ := strconv.Atoi(splitinput[1])
+			bid(inputint)
+			//print depending on bidreplymessage, ie. did it go through or was it lower than the current bid
+		} else {
+			fmt.Println("Unknown command. Type 'result' for current auction status. Type 'bid (integer)' to bid.")
+		}
 
 		if err != nil {
 			log.Printf("Client %s: no response from the server, attempting to reconnect", *clientsName)
@@ -112,9 +122,16 @@ func parseInput() {
 		}
 	}
 }
+func bid(bidamount int){
+
+}
+
+func result(){
+
+}
 
 // Function which returns a true boolean if the connection to the server is ready, and false if it's not.
-func conReady(s gRPC.ChittyChatClient) bool {
+func conReady(s gRPC.AuctionClient) bool {
 	return ServerConn.GetState().String() == "READY"
 }
 

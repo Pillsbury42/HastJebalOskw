@@ -42,6 +42,7 @@ message EmptyMessage {
 
 service Auction {
   rpc bid(BidMessage) returns (BidReplyMessage);
+  rpc bidupdate(BidMessage) returns (EmptyMessage);
   rpc result(ResultMessage) returns (ResultReplyMessage);
   rpc election(ElectionMessage) returns (ElectionReplyMessage);
   rpc coordinator(CoordinatorMessage) returns (EmptyMessage); 

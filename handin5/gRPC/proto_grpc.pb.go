@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.24.3
-// source: proto/proto.proto
+// source: gRPC/proto.proto
 
 package gRPC
 
@@ -19,8 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Auction_Bid_FullMethodName    = "/gRPC.Auction/bid"
-	Auction_Result_FullMethodName = "/gRPC.Auction/result"
+	Auction_Bid_FullMethodName         = "/gRPC.Auction/bid"
+	Auction_Bidupdate_FullMethodName   = "/gRPC.Auction/bidupdate"
+	Auction_Result_FullMethodName      = "/gRPC.Auction/result"
+	Auction_Election_FullMethodName    = "/gRPC.Auction/election"
+	Auction_Coordinator_FullMethodName = "/gRPC.Auction/coordinator"
 )
 
 // AuctionClient is the client API for Auction service.
@@ -28,7 +31,10 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuctionClient interface {
 	Bid(ctx context.Context, in *BidMessage, opts ...grpc.CallOption) (*BidReplyMessage, error)
+	Bidupdate(ctx context.Context, in *BidMessage, opts ...grpc.CallOption) (*EmptyMessage, error)
 	Result(ctx context.Context, in *ResultMessage, opts ...grpc.CallOption) (*ResultReplyMessage, error)
+	Election(ctx context.Context, in *ElectionMessage, opts ...grpc.CallOption) (*ElectionReplyMessage, error)
+	Coordinator(ctx context.Context, in *CoordinatorMessage, opts ...grpc.CallOption) (*EmptyMessage, error)
 }
 
 type auctionClient struct {
@@ -48,9 +54,36 @@ func (c *auctionClient) Bid(ctx context.Context, in *BidMessage, opts ...grpc.Ca
 	return out, nil
 }
 
+func (c *auctionClient) Bidupdate(ctx context.Context, in *BidMessage, opts ...grpc.CallOption) (*EmptyMessage, error) {
+	out := new(EmptyMessage)
+	err := c.cc.Invoke(ctx, Auction_Bidupdate_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *auctionClient) Result(ctx context.Context, in *ResultMessage, opts ...grpc.CallOption) (*ResultReplyMessage, error) {
 	out := new(ResultReplyMessage)
 	err := c.cc.Invoke(ctx, Auction_Result_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *auctionClient) Election(ctx context.Context, in *ElectionMessage, opts ...grpc.CallOption) (*ElectionReplyMessage, error) {
+	out := new(ElectionReplyMessage)
+	err := c.cc.Invoke(ctx, Auction_Election_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *auctionClient) Coordinator(ctx context.Context, in *CoordinatorMessage, opts ...grpc.CallOption) (*EmptyMessage, error) {
+	out := new(EmptyMessage)
+	err := c.cc.Invoke(ctx, Auction_Coordinator_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -62,7 +95,10 @@ func (c *auctionClient) Result(ctx context.Context, in *ResultMessage, opts ...g
 // for forward compatibility
 type AuctionServer interface {
 	Bid(context.Context, *BidMessage) (*BidReplyMessage, error)
+	Bidupdate(context.Context, *BidMessage) (*EmptyMessage, error)
 	Result(context.Context, *ResultMessage) (*ResultReplyMessage, error)
+	Election(context.Context, *ElectionMessage) (*ElectionReplyMessage, error)
+	Coordinator(context.Context, *CoordinatorMessage) (*EmptyMessage, error)
 	mustEmbedUnimplementedAuctionServer()
 }
 
@@ -73,8 +109,17 @@ type UnimplementedAuctionServer struct {
 func (UnimplementedAuctionServer) Bid(context.Context, *BidMessage) (*BidReplyMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Bid not implemented")
 }
+func (UnimplementedAuctionServer) Bidupdate(context.Context, *BidMessage) (*EmptyMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Bidupdate not implemented")
+}
 func (UnimplementedAuctionServer) Result(context.Context, *ResultMessage) (*ResultReplyMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Result not implemented")
+}
+func (UnimplementedAuctionServer) Election(context.Context, *ElectionMessage) (*ElectionReplyMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Election not implemented")
+}
+func (UnimplementedAuctionServer) Coordinator(context.Context, *CoordinatorMessage) (*EmptyMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Coordinator not implemented")
 }
 func (UnimplementedAuctionServer) mustEmbedUnimplementedAuctionServer() {}
 
@@ -107,6 +152,24 @@ func _Auction_Bid_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Auction_Bidupdate_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BidMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuctionServer).Bidupdate(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Auction_Bidupdate_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuctionServer).Bidupdate(ctx, req.(*BidMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Auction_Result_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ResultMessage)
 	if err := dec(in); err != nil {
@@ -125,6 +188,42 @@ func _Auction_Result_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Auction_Election_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ElectionMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuctionServer).Election(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Auction_Election_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuctionServer).Election(ctx, req.(*ElectionMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Auction_Coordinator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CoordinatorMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuctionServer).Coordinator(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Auction_Coordinator_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuctionServer).Coordinator(ctx, req.(*CoordinatorMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Auction_ServiceDesc is the grpc.ServiceDesc for Auction service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -137,137 +236,22 @@ var Auction_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Auction_Bid_Handler,
 		},
 		{
+			MethodName: "bidupdate",
+			Handler:    _Auction_Bidupdate_Handler,
+		},
+		{
 			MethodName: "result",
 			Handler:    _Auction_Result_Handler,
 		},
-	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/proto.proto",
-}
-
-const (
-	Bully_Election_FullMethodName    = "/gRPC.Bully/election"
-	Bully_Coordinator_FullMethodName = "/gRPC.Bully/coordinator"
-)
-
-// BullyClient is the client API for Bully service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type BullyClient interface {
-	Election(ctx context.Context, in *ElectionMessage, opts ...grpc.CallOption) (*ElectionReplyMessage, error)
-	Coordinator(ctx context.Context, in *CoordinatorMessage, opts ...grpc.CallOption) (*EmptyMessage, error)
-}
-
-type bullyClient struct {
-	cc grpc.ClientConnInterface
-}
-
-func NewBullyClient(cc grpc.ClientConnInterface) BullyClient {
-	return &bullyClient{cc}
-}
-
-func (c *bullyClient) Election(ctx context.Context, in *ElectionMessage, opts ...grpc.CallOption) (*ElectionReplyMessage, error) {
-	out := new(ElectionReplyMessage)
-	err := c.cc.Invoke(ctx, Bully_Election_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *bullyClient) Coordinator(ctx context.Context, in *CoordinatorMessage, opts ...grpc.CallOption) (*EmptyMessage, error) {
-	out := new(EmptyMessage)
-	err := c.cc.Invoke(ctx, Bully_Coordinator_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// BullyServer is the server API for Bully service.
-// All implementations must embed UnimplementedBullyServer
-// for forward compatibility
-type BullyServer interface {
-	Election(context.Context, *ElectionMessage) (*ElectionReplyMessage, error)
-	Coordinator(context.Context, *CoordinatorMessage) (*EmptyMessage, error)
-	mustEmbedUnimplementedBullyServer()
-}
-
-// UnimplementedBullyServer must be embedded to have forward compatible implementations.
-type UnimplementedBullyServer struct {
-}
-
-func (UnimplementedBullyServer) Election(context.Context, *ElectionMessage) (*ElectionReplyMessage, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Election not implemented")
-}
-func (UnimplementedBullyServer) Coordinator(context.Context, *CoordinatorMessage) (*EmptyMessage, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Coordinator not implemented")
-}
-func (UnimplementedBullyServer) mustEmbedUnimplementedBullyServer() {}
-
-// UnsafeBullyServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to BullyServer will
-// result in compilation errors.
-type UnsafeBullyServer interface {
-	mustEmbedUnimplementedBullyServer()
-}
-
-func RegisterBullyServer(s grpc.ServiceRegistrar, srv BullyServer) {
-	s.RegisterService(&Bully_ServiceDesc, srv)
-}
-
-func _Bully_Election_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ElectionMessage)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BullyServer).Election(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Bully_Election_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BullyServer).Election(ctx, req.(*ElectionMessage))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Bully_Coordinator_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CoordinatorMessage)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(BullyServer).Coordinator(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Bully_Coordinator_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(BullyServer).Coordinator(ctx, req.(*CoordinatorMessage))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-// Bully_ServiceDesc is the grpc.ServiceDesc for Bully service.
-// It's only intended for direct use with grpc.RegisterService,
-// and not to be introspected or modified (even as a copy)
-var Bully_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "gRPC.Bully",
-	HandlerType: (*BullyServer)(nil),
-	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "election",
-			Handler:    _Bully_Election_Handler,
+			Handler:    _Auction_Election_Handler,
 		},
 		{
 			MethodName: "coordinator",
-			Handler:    _Bully_Coordinator_Handler,
+			Handler:    _Auction_Coordinator_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/proto.proto",
+	Metadata: "gRPC/proto.proto",
 }

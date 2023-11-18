@@ -22,7 +22,10 @@ var myName = flag.String("name", "default", "This node's name")
 var listenPort = flag.String("clientp", "5400", "receiving port")
 var serverPort = flag.String("serverp", "5401", "sending port")
 var hasToken = flag.String("hastoken", "false", "Starts with token")
-var isConnected = false
+func (s *gRPC.UnimplementedAuctionServer) Bid(ctx context.Context, msg *gRPC.BidMessage) (*gRPC.BidReplyMessage, error) {
+	//The node receives a bid from a client, processes this, copies it to the others, and returns a bid reply message,
+	//If the node is not the leader, then it means the leader must have crashed, so it calls an election
+}
 var nextNode gRPC.MutexClient //the server
 var nextConn *grpc.ClientConn //the "server" connection, used to check if the other node is responding and to close the connection
 
