@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.24.3
-// source: gRPC/proto.proto
+// source: handin5/gRPC/proto.proto
 
 package gRPC
 
@@ -32,8 +32,8 @@ const (
 type AuctionClient interface {
 	Bid(ctx context.Context, in *BidMessage, opts ...grpc.CallOption) (*BidReplyMessage, error)
 	Bidupdate(ctx context.Context, in *BidMessage, opts ...grpc.CallOption) (*EmptyMessage, error)
-	Result(ctx context.Context, in *ResultMessage, opts ...grpc.CallOption) (*ResultReplyMessage, error)
-	Election(ctx context.Context, in *ElectionMessage, opts ...grpc.CallOption) (*ElectionReplyMessage, error)
+	Result(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*ResultReplyMessage, error)
+	Election(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*ElectionReplyMessage, error)
 	Coordinator(ctx context.Context, in *CoordinatorMessage, opts ...grpc.CallOption) (*EmptyMessage, error)
 }
 
@@ -63,7 +63,7 @@ func (c *auctionClient) Bidupdate(ctx context.Context, in *BidMessage, opts ...g
 	return out, nil
 }
 
-func (c *auctionClient) Result(ctx context.Context, in *ResultMessage, opts ...grpc.CallOption) (*ResultReplyMessage, error) {
+func (c *auctionClient) Result(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*ResultReplyMessage, error) {
 	out := new(ResultReplyMessage)
 	err := c.cc.Invoke(ctx, Auction_Result_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -72,7 +72,7 @@ func (c *auctionClient) Result(ctx context.Context, in *ResultMessage, opts ...g
 	return out, nil
 }
 
-func (c *auctionClient) Election(ctx context.Context, in *ElectionMessage, opts ...grpc.CallOption) (*ElectionReplyMessage, error) {
+func (c *auctionClient) Election(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*ElectionReplyMessage, error) {
 	out := new(ElectionReplyMessage)
 	err := c.cc.Invoke(ctx, Auction_Election_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -96,8 +96,8 @@ func (c *auctionClient) Coordinator(ctx context.Context, in *CoordinatorMessage,
 type AuctionServer interface {
 	Bid(context.Context, *BidMessage) (*BidReplyMessage, error)
 	Bidupdate(context.Context, *BidMessage) (*EmptyMessage, error)
-	Result(context.Context, *ResultMessage) (*ResultReplyMessage, error)
-	Election(context.Context, *ElectionMessage) (*ElectionReplyMessage, error)
+	Result(context.Context, *EmptyMessage) (*ResultReplyMessage, error)
+	Election(context.Context, *EmptyMessage) (*ElectionReplyMessage, error)
 	Coordinator(context.Context, *CoordinatorMessage) (*EmptyMessage, error)
 	mustEmbedUnimplementedAuctionServer()
 }
@@ -112,10 +112,10 @@ func (UnimplementedAuctionServer) Bid(context.Context, *BidMessage) (*BidReplyMe
 func (UnimplementedAuctionServer) Bidupdate(context.Context, *BidMessage) (*EmptyMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Bidupdate not implemented")
 }
-func (UnimplementedAuctionServer) Result(context.Context, *ResultMessage) (*ResultReplyMessage, error) {
+func (UnimplementedAuctionServer) Result(context.Context, *EmptyMessage) (*ResultReplyMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Result not implemented")
 }
-func (UnimplementedAuctionServer) Election(context.Context, *ElectionMessage) (*ElectionReplyMessage, error) {
+func (UnimplementedAuctionServer) Election(context.Context, *EmptyMessage) (*ElectionReplyMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Election not implemented")
 }
 func (UnimplementedAuctionServer) Coordinator(context.Context, *CoordinatorMessage) (*EmptyMessage, error) {
@@ -171,7 +171,7 @@ func _Auction_Bidupdate_Handler(srv interface{}, ctx context.Context, dec func(i
 }
 
 func _Auction_Result_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ResultMessage)
+	in := new(EmptyMessage)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -183,13 +183,13 @@ func _Auction_Result_Handler(srv interface{}, ctx context.Context, dec func(inte
 		FullMethod: Auction_Result_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuctionServer).Result(ctx, req.(*ResultMessage))
+		return srv.(AuctionServer).Result(ctx, req.(*EmptyMessage))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
 func _Auction_Election_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ElectionMessage)
+	in := new(EmptyMessage)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -201,7 +201,7 @@ func _Auction_Election_Handler(srv interface{}, ctx context.Context, dec func(in
 		FullMethod: Auction_Election_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuctionServer).Election(ctx, req.(*ElectionMessage))
+		return srv.(AuctionServer).Election(ctx, req.(*EmptyMessage))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -253,5 +253,5 @@ var Auction_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "gRPC/proto.proto",
+	Metadata: "handin5/gRPC/proto.proto",
 }

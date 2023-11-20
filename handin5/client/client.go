@@ -15,7 +15,7 @@ import (
 
 	// this has to be the same as the go.mod module,
 	// followed by the path to the folder the proto file is in.
-	gRPC "github.com/hannaStokes/handin5/gRPC"
+	gRPC "github.com/Pillsbury42/HastJebalOskw/handin5/gRPC"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -73,8 +73,8 @@ func ConnectToServer() {
 
 func parseInput() {
 	reader := bufio.NewReader(os.Stdin)
-	fmt.Println("Type the message you wish to send below")
-	fmt.Print("-> ")
+	fmt.Println("Type the command you wish to execute below")
+	fmt.Print("Valid commands: bid <value>; result ")
 
 
 	//Infinite loop to listen for clients input.
@@ -118,15 +118,21 @@ func bid(bidamount int){
 		BidderID: clientsName,
 		Amount: bidamount,
 	}
-	server.Bid(context.Background(), msg)
+	res, _ := server.Bid(context.Background(), msg)
+	if (res.success == true){
+		fmt.Println("Bid completed. You are now the highest bidder.")
+	} else {
+		fmt.Println("Bid failed, as it was too low.")
+	} 
 }
 
 func result(){
 	res, _ := server.Result(context.Background(), &gRPC.EmptyMessage{})
-	if (res.Over) {
-		fmt.Println("Bid is over. The highest bid was %d by bidder %s" res.WinnerID, res.Highest)
+	if (res.over) {
+		fmt.Println("Bid is over. The highest bid was %d by bidder %s", res.winnerID, res.highest)
+	} else {
+		fmt.Println("Bid is NOT over. The highest bid so far is %d by bidder %s", res.winnerID, res.highest)
 	}
-	fmt.Println()
 }
 
 // Function which returns a true boolean if the connection to the server is ready, and false if it's not.

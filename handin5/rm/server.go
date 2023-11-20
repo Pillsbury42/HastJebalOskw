@@ -69,6 +69,7 @@ func launchServer(port string) {
 	}
 	// code here is unreachable because grpcServer.Serve occupies the current thread.
 }
+
 func ConnectToServer(port string) gRPC.NewAuctionClient {
 	opts := []grpc.DialOption{
 		grpc.WithBlock(),
@@ -81,10 +82,11 @@ func ConnectToServer(port string) gRPC.NewAuctionClient {
 		log.Printf("Fail to Dial : %v", err)
 		return nil
 	}
-	server := gRPC.NewAuctionClient(conn) 
+	server := gRPC.NewAuctionClient(conn)
 	log.Println("the connection is: ", conn.GetState().String())
 	return server
 }
+
 func (s *gRPC.UnimplementedAuctionServer) Bid(ctx context.Context, msg *gRPC.BidMessage) (*gRPC.BidReplyMessage, error) {
 	//The node receives a bid from a client, processes this, copies it to the others, and returns a bid reply message,
 	
@@ -105,30 +107,60 @@ func (s *gRPC.UnimplementedAuctionServer) Bid(ctx context.Context, msg *gRPC.Bid
 	} else { //If the node is not the leader, then it means the leader must have crashed
 		for _, element := range nodeList {
 			if (element.nodeId > myID){
-				electmsg := gRPC.ElectionMessage{
-					
-				}
-				element.nodeClient.Election(context.Background(), electmsg)
+				element.nodeClient.Election(context.Background(), &gRPC.EmptyMessage{})
 			}
 		}
 	}
 }
-func (s *gRPC.UnimplementedAuctionServer) BidUpdate(ctx context.Context, msg *gRPC.BidUpdateMessage) (*gRPC.EmptyMessage, error) {
+func (s *gRPC.UnimplementedAuctionServer) BidUpdate(ctx context.Context, msg *gRPC.BidMessage) (*gRPC.EmptyMessage, error) {
 	//The node receives a message from the leader telling it what the new highest bid is and updates accordingly
+	topBid.bidderID=msg.bidderID
+	topBid.highestBid=msg.highestBid
 }
 func (s *gRPC.UnimplementedAuctionServer) Result(ctx context.Context, msg *gRPC.ResultMessage) (*gRPC.ResultReplyMessage, error) {
 	//The node receives a query for the current status of the auction from a client,
 	//and returns a reply either detailing who won the auction, or what the current highest bid is and how long is left
 	//Once again, if this node is not the leader, then an election is called
+	if (time.Now().Unix() - endTime< 100) {
+		return &gRPC.ResultReplyMessage{over : false, winnerID : topBid.bidderID, highest : topBid.highestBid}
+	} else {
+		return &gRPC.ResultReplyMessage{over : true, winnerID : topBid.bidderID, highest : topBid.highestBid}
+	}
 }
-func (s *gRPC.UnimplementedAuctionServer) Election(ctx context.Context, msg *gRPC.ElectionMessage) (*gRPC.ElectionReplyMessage, error) {
+
+func (s *gRPC.UnimplementedAuctionServer) Election(ctx context.Context, msg *gRPC.EmptyMessage) (*gRPC.ElectionReplyMessage, error) {
+	
 	//The node receives a query from another node, asking who the highest alive node is
 	//It then iterates through all nodes higher than itself, asking them the same question
 	//It then takes the answer from the highest node and returns it in an election reply message
 	//If it is the highest node alive, i.e. if none of the other nodes answer, 
 	//then it sends out coordinator messages to all other nodes telling them that it is the new leader
+	var countHigher=0
+	for _, node := range nodeList {
+		if (node.nodeId > myID){
+			countHigher++
+			node.nodeClient.Election(context.Background(), &gRPC.EmptyMessage{})
+		}
+	}
+
+	if (countHigher==0 ) {
+		coordmsg := CoordinatorMessage{
+			CoordID: myID,
+		}
+		for _, node := range nodeList {
+			node.nodeClient.Coordinator(context.Background(), coordmsg)
+		}
+	}
+
+	msg := ElectionReplyMessage {
+		ReplyID: highestID,
+	}
+	return (msg, nil)
+	
 }
+
 func (s *gRPC.UnimplementedAuctionServer) Coordinator(ctx context.Context, msg *gRPC.CoordinatorMessage) (*gRPC.EmptyMessage, error) {
 	//The node receives a message from another node, telling it that the other node is the new leader
 	//The node updates its leader-variable accordingly.
+	isLeader=false
 }

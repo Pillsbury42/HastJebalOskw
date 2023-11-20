@@ -10,22 +10,14 @@ message BidMessage {
     int64 amount = 2;
 }
 
-message ResultMessage{ //don't need this, just send empty message?
-    int64 rmID = 1; //move this to result reply message?
-}
-
 message BidReplyMessage {
-    int64 status = 1; //fail: 1, success: 2, or exception:3
+    bool success = 1;
 }
 
 message ResultReplyMessage {
     bool over = 1; //is auction over?
     int64 winnerID = 2; //id of the winner
     int64 highest = 3; //the highest bid
-}
-
-message ElectionMessage {
-
 }
 
 message ElectionReplyMessage {
@@ -43,7 +35,7 @@ message EmptyMessage {
 service Auction {
   rpc bid(BidMessage) returns (BidReplyMessage);
   rpc bidupdate(BidMessage) returns (EmptyMessage);
-  rpc result(ResultMessage) returns (ResultReplyMessage);
-  rpc election(ElectionMessage) returns (ElectionReplyMessage);
+  rpc result(EmptyMessage) returns (ResultReplyMessage);
+  rpc election(EmptyMessage) returns (ElectionReplyMessage);
   rpc coordinator(CoordinatorMessage) returns (EmptyMessage); 
 }
