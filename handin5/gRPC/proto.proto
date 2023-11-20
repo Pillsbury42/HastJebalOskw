@@ -10,8 +10,8 @@ message BidMessage {
     int64 amount = 2;
 }
 
-message ResultMessage{
-    int64 rmID = 1;
+message ResultMessage{ //don't need this, just send empty message?
+    int64 rmID = 1; //move this to result reply message?
 }
 
 message BidReplyMessage {

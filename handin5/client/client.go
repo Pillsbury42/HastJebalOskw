@@ -22,7 +22,7 @@ import (
 )
 
 var clientsName = flag.String("name", "default", "Senders name")
-var serverPorts = [4]string{"5400", "5401", "5402", "5403"}
+var serverPort = flag.String("serverp", "5401", "sending port")
 
 var server gRPC.AuctionClient //the server
 var ServerConn *grpc.ClientConn  //the server connection
@@ -42,18 +42,9 @@ func main() {
 	ConnectToServer()
 	defer ServerConn.Close()
 
-	msg := &gRPC.BidMessage{
-		ClientName: *clientsName,
-		Timestamp:  clientsTime,
-	}
-
-	go bid(ctx, msg)
-
 	//start the bidding
 	parseInput()
 }
-
-func (s *Server) bid(ctx context.Context, msg *gRPC.BidMessage) (*gRPC.BidReplyMessage, error)
 
 func ConnectToServer() {
 
@@ -113,7 +104,7 @@ func parseInput() {
 			bid(inputint)
 			//print depending on bidreplymessage, ie. did it go through or was it lower than the current bid
 		} else {
-			fmt.Println("Unknown command. Type 'result' for current auction status. Type 'bid (integer)' to bid.")
+			fmt.Println("Unknown command. Type 'result' for current auction status. Type 'bid <integer>' to bid.")
 		}
 
 		if err != nil {
@@ -123,11 +114,19 @@ func parseInput() {
 	}
 }
 func bid(bidamount int){
-
+	msg := &gRPC.BidMessage{
+		BidderID: clientsName,
+		Amount: bidamount,
+	}
+	server.Bid(context.Background(), msg)
 }
 
 func result(){
-
+	res, _ := server.Result(context.Background(), &gRPC.EmptyMessage{})
+	if (res.Over) {
+		fmt.Println("Bid is over. The highest bid was %d by bidder %s" res.WinnerID, res.Highest)
+	}
+	fmt.Println()
 }
 
 // Function which returns a true boolean if the connection to the server is ready, and false if it's not.
