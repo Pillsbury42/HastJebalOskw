@@ -24,6 +24,7 @@ const (
 	Auction_Result_FullMethodName      = "/gRPC.Auction/result"
 	Auction_Election_FullMethodName    = "/gRPC.Auction/election"
 	Auction_Coordinator_FullMethodName = "/gRPC.Auction/coordinator"
+	Auction_Start_FullMethodName       = "/gRPC.Auction/start"
 )
 
 // AuctionClient is the client API for Auction service.
@@ -35,6 +36,7 @@ type AuctionClient interface {
 	Result(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*ResultReplyMessage, error)
 	Election(ctx context.Context, in *EmptyMessage, opts ...grpc.CallOption) (*ElectionReplyMessage, error)
 	Coordinator(ctx context.Context, in *CoordinatorMessage, opts ...grpc.CallOption) (*EmptyMessage, error)
+	Start(ctx context.Context, in *StartMessage, opts ...grpc.CallOption) (*EmptyMessage, error)
 }
 
 type auctionClient struct {
@@ -90,6 +92,15 @@ func (c *auctionClient) Coordinator(ctx context.Context, in *CoordinatorMessage,
 	return out, nil
 }
 
+func (c *auctionClient) Start(ctx context.Context, in *StartMessage, opts ...grpc.CallOption) (*EmptyMessage, error) {
+	out := new(EmptyMessage)
+	err := c.cc.Invoke(ctx, Auction_Start_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // AuctionServer is the server API for Auction service.
 // All implementations must embed UnimplementedAuctionServer
 // for forward compatibility
@@ -99,6 +110,7 @@ type AuctionServer interface {
 	Result(context.Context, *EmptyMessage) (*ResultReplyMessage, error)
 	Election(context.Context, *EmptyMessage) (*ElectionReplyMessage, error)
 	Coordinator(context.Context, *CoordinatorMessage) (*EmptyMessage, error)
+	Start(context.Context, *StartMessage) (*EmptyMessage, error)
 	mustEmbedUnimplementedAuctionServer()
 }
 
@@ -120,6 +132,9 @@ func (UnimplementedAuctionServer) Election(context.Context, *EmptyMessage) (*Ele
 }
 func (UnimplementedAuctionServer) Coordinator(context.Context, *CoordinatorMessage) (*EmptyMessage, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Coordinator not implemented")
+}
+func (UnimplementedAuctionServer) Start(context.Context, *StartMessage) (*EmptyMessage, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Start not implemented")
 }
 func (UnimplementedAuctionServer) mustEmbedUnimplementedAuctionServer() {}
 
@@ -224,6 +239,24 @@ func _Auction_Coordinator_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Auction_Start_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StartMessage)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuctionServer).Start(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Auction_Start_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuctionServer).Start(ctx, req.(*StartMessage))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Auction_ServiceDesc is the grpc.ServiceDesc for Auction service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -250,6 +283,10 @@ var Auction_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "coordinator",
 			Handler:    _Auction_Coordinator_Handler,
+		},
+		{
+			MethodName: "start",
+			Handler:    _Auction_Start_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

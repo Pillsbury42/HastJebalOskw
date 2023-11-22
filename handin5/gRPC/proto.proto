@@ -28,6 +28,10 @@ message CoordinatorMessage {
     int64 coordID = 1;
 }
 
+message StartMessage {
+    int64 startTime = 1;
+}
+
 message EmptyMessage {
     
 }
@@ -38,4 +42,5 @@ service Auction {
   rpc result(EmptyMessage) returns (ResultReplyMessage);
   rpc election(EmptyMessage) returns (ElectionReplyMessage);
   rpc coordinator(CoordinatorMessage) returns (EmptyMessage); 
+  rpc start(StartMessage) returns (EmptyMessage);
 }
