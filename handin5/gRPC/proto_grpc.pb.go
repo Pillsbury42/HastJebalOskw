@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.3.0
 // - protoc             v4.24.3
-// source: handin5/gRPC/proto.proto
+// source: gRPC/proto.proto
 
 package gRPC
 
@@ -253,5 +253,5 @@ var Auction_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "handin5/gRPC/proto.proto",
+	Metadata: "gRPC/proto.proto",
 }

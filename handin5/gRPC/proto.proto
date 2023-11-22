@@ -6,7 +6,7 @@ package gRPC;
 option go_package = "github.com/Pillsbury42/HastJebalOskw/handin5/gRPC";
 
 message BidMessage {
-    int64 bidderID = 1;
+    string bidderName = 1;
     int64 amount = 2;
 }
 
@@ -16,7 +16,7 @@ message BidReplyMessage {
 
 message ResultReplyMessage {
     bool over = 1; //is auction over?
-    int64 winnerID = 2; //id of the winner
+    string winnerName = 2; //id of the winner
     int64 highest = 3; //the highest bid
 }
 

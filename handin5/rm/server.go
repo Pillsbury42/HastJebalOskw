@@ -14,24 +14,27 @@ import (
 	gRPC "github.com/Pillsbury42/HastJebalOskw/handin5/gRPC"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-
-	"google.golang.org/grpc"
 )
 
 var isLeader = false
 var nodeList []Node //List of nodes, ideally in order of priority
-var bidderIDs map[int64]struct{} //golang doesn't have sets, but a map with empty struct as value has the same effect
+var bidderNames map[string]struct{} //golang doesn't have sets, but a map with empty struct as value has the same effect
+
 var topBid struct {
-	bidderID   int64
+	bidderName   string
 	highestBid int64
 }
-var myID int64
 
+var myID int64
+//This is just a wrapper to inherit
+type ImplementedAuctionServer struct{
+	gRPC.UnimplementedAuctionServer
+}
 type Node struct {
-	nodeClient   gRPC.NewAuctionClient
+	nodeClient   gRPC.AuctionClient 
 	nodeId int64
 }
-var endTime time.Time //The ending time of the auction
+var startTime int64 //The start time of the auction, which is compared against when determining if the auction is over
 
 func main() {
 	//f := setLog()
@@ -41,12 +44,13 @@ func main() {
 
 	go launchServer(myport)
 	//This must be able to connect to multiple other nodes
-	server:=ConnectToServer(otherport)
+	server := ConnectToServer(otherport)
 
 	for true {
 		//an infinite loop to ensure the program keeps running
 	}
 }
+
 func launchServer(port string) {
 	log.Printf("Attempting to create listener on port %s\n", port)
 
@@ -60,7 +64,7 @@ func launchServer(port string) {
 	var opts []grpc.ServerOption
 	grpcServer := grpc.NewServer(opts...)
 
-	gRPC.RegisterAuctionServer(grpcServer, gRPC.UnimplementedAuctionServer)
+	gRPC.RegisterAuctionServer(grpcServer, ImplementedAuctionServer{})
 
 	log.Printf("Listening at %v\n\n", list.Addr())
 
@@ -70,7 +74,7 @@ func launchServer(port string) {
 	// code here is unreachable because grpcServer.Serve occupies the current thread.
 }
 
-func ConnectToServer(port string) gRPC.NewAuctionClient {
+func ConnectToServer(port string) gRPC.AuctionClient {
 	opts := []grpc.DialOption{
 		grpc.WithBlock(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -87,48 +91,66 @@ func ConnectToServer(port string) gRPC.NewAuctionClient {
 	return server
 }
 
-func (s *gRPC.UnimplementedAuctionServer) Bid(ctx context.Context, msg *gRPC.BidMessage) (*gRPC.BidReplyMessage, error) {
+func (s ImplementedAuctionServer) Bid(ctx context.Context, msg *gRPC.BidMessage) (*gRPC.BidReplyMessage, error) {
 	//The node receives a bid from a client, processes this, copies it to the others, and returns a bid reply message,
-	
+	var reply *gRPC.BidReplyMessage
+	if (startTim)
 	//Process:
-	if (isLeader){
-		//Has this client bid before?
-		if _, ok := bidderIDs[msg.bidderID]; !ok {
-			bidderIDs[msg.bidderID] =struct{}{}
-		}
-		//Is this bid higher than the current max?
-		if topBid.highestBid<msg.bidamount {
-			topBid.bidderID=msg.bidderID
-			topBid.highestBid=msg.highestBid
+	if (time.Now().Unix() - startTime < 100){
+		if (isLeader){
+			//Has this client bid before?
+			if _, ok := bidderNames[msg.BidderName]; !ok {
+				bidderNames[msg.BidderName] =struct{}{}
+			}
+			//Is this bid higher than the current max?
+			if topBid.highestBid<msg.Amount {
+				topBid.bidderName = msg.BidderName
+				topBid.highestBid = msg.Amount
+				for _, element := range nodeList {
+					element.nodeClient.Bidupdate(context.Background(), msg)
+				}
+			}
+			reply = &gRPC.BidReplyMessage{
+				Success: true,
+			}
+		} else { //If the node is not the leader, then it means the leader must have crashed
 			for _, element := range nodeList {
-				element.nodeClient.Bidupdate(context.Background(), msg)
+				if (element.nodeId > myID){
+					element.nodeClient.Election(context.Background(), &gRPC.EmptyMessage{})
+				}
+			}
+			reply = &gRPC.BidReplyMessage{
+				Success: false,
 			}
 		}
-	} else { //If the node is not the leader, then it means the leader must have crashed
-		for _, element := range nodeList {
-			if (element.nodeId > myID){
-				element.nodeClient.Election(context.Background(), &gRPC.EmptyMessage{})
-			}
+	} else {
+		reply = &gRPC.BidReplyMessage{
+			Success: false,
 		}
 	}
+
+	return reply, nil
+
 }
-func (s *gRPC.UnimplementedAuctionServer) BidUpdate(ctx context.Context, msg *gRPC.BidMessage) (*gRPC.EmptyMessage, error) {
+
+func (s ImplementedAuctionServer) BidUpdate(ctx context.Context, msg *gRPC.BidMessage) (*gRPC.EmptyMessage, error) {
 	//The node receives a message from the leader telling it what the new highest bid is and updates accordingly
-	topBid.bidderID=msg.bidderID
-	topBid.highestBid=msg.highestBid
+	topBid.bidderName=msg.BidderName
+	topBid.highestBid=msg.Amount
+	return &gRPC.EmptyMessage{}, nil
 }
-func (s *gRPC.UnimplementedAuctionServer) Result(ctx context.Context, msg *gRPC.ResultMessage) (*gRPC.ResultReplyMessage, error) {
+func (s ImplementedAuctionServer) Result(ctx context.Context, msg *gRPC.EmptyMessage) (*gRPC.ResultReplyMessage, error) {
 	//The node receives a query for the current status of the auction from a client,
 	//and returns a reply either detailing who won the auction, or what the current highest bid is and how long is left
 	//Once again, if this node is not the leader, then an election is called
-	if (time.Now().Unix() - endTime< 100) {
-		return &gRPC.ResultReplyMessage{over : false, winnerID : topBid.bidderID, highest : topBid.highestBid}
+	if (time.Now().Unix() - startTime < 100) {
+		return &gRPC.ResultReplyMessage{Over : false, WinnerName : topBid.bidderName, Highest : topBid.highestBid}, nil
 	} else {
-		return &gRPC.ResultReplyMessage{over : true, winnerID : topBid.bidderID, highest : topBid.highestBid}
+		return &gRPC.ResultReplyMessage{Over : true, WinnerName : topBid.bidderName, Highest : topBid.highestBid}, nil
 	}
 }
 
-func (s *gRPC.UnimplementedAuctionServer) Election(ctx context.Context, msg *gRPC.EmptyMessage) (*gRPC.ElectionReplyMessage, error) {
+func (s ImplementedAuctionServer) Election(ctx context.Context, msg *gRPC.EmptyMessage) (*gRPC.ElectionReplyMessage, error) {
 	
 	//The node receives a query from another node, asking who the highest alive node is
 	//It then iterates through all nodes higher than itself, asking them the same question
@@ -136,15 +158,17 @@ func (s *gRPC.UnimplementedAuctionServer) Election(ctx context.Context, msg *gRP
 	//If it is the highest node alive, i.e. if none of the other nodes answer, 
 	//then it sends out coordinator messages to all other nodes telling them that it is the new leader
 	var countHigher=0
+	var highestID=myID
 	for _, node := range nodeList {
 		if (node.nodeId > myID){
 			countHigher++
+			highestID=node.nodeId
 			node.nodeClient.Election(context.Background(), &gRPC.EmptyMessage{})
 		}
 	}
-
+	//If no other nodes respond, then I am the winner
 	if (countHigher==0 ) {
-		coordmsg := CoordinatorMessage{
+		coordmsg := &gRPC.CoordinatorMessage{
 			CoordID: myID,
 		}
 		for _, node := range nodeList {
@@ -152,15 +176,16 @@ func (s *gRPC.UnimplementedAuctionServer) Election(ctx context.Context, msg *gRP
 		}
 	}
 
-	msg := ElectionReplyMessage {
+	reply := &gRPC.ElectionReplyMessage {
 		ReplyID: highestID,
 	}
-	return (msg, nil)
+	return reply, nil
 	
 }
 
-func (s *gRPC.UnimplementedAuctionServer) Coordinator(ctx context.Context, msg *gRPC.CoordinatorMessage) (*gRPC.EmptyMessage, error) {
+func (s ImplementedAuctionServer) Coordinator(ctx context.Context, msg *gRPC.CoordinatorMessage) (*gRPC.EmptyMessage, error) {
 	//The node receives a message from another node, telling it that the other node is the new leader
 	//The node updates its leader-variable accordingly.
 	isLeader=false
+	return &gRPC.EmptyMessage{}, nil
 }

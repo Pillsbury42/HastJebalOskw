@@ -101,7 +101,8 @@ func parseInput() {
 			fmt.Printf("Processing bid...")
 			var splitinput = strings.Split(input, " ")
 			inputint, _ := strconv.Atoi(splitinput[1])
-			bid(inputint)
+			in := int64(inputint)
+			bid(in)
 			//print depending on bidreplymessage, ie. did it go through or was it lower than the current bid
 		} else {
 			fmt.Println("Unknown command. Type 'result' for current auction status. Type 'bid <integer>' to bid.")
@@ -113,25 +114,25 @@ func parseInput() {
 		}
 	}
 }
-func bid(bidamount int){
+func bid(bidamount int64){
 	msg := &gRPC.BidMessage{
-		BidderID: clientsName,
+		BidderName: *clientsName, //change proto
 		Amount: bidamount,
 	}
 	res, _ := server.Bid(context.Background(), msg)
-	if (res.success == true){
+	if (res.Success == true){
 		fmt.Println("Bid completed. You are now the highest bidder.")
 	} else {
-		fmt.Println("Bid failed, as it was too low.")
+		fmt.Println("Bid failed.")
 	} 
 }
 
 func result(){
 	res, _ := server.Result(context.Background(), &gRPC.EmptyMessage{})
-	if (res.over) {
-		fmt.Println("Bid is over. The highest bid was %d by bidder %s", res.winnerID, res.highest)
+	if (res.Over) {
+		fmt.Println("Bid is over. The highest bid was %s by bidder %d", res.WinnerName, res.Highest)
 	} else {
-		fmt.Println("Bid is NOT over. The highest bid so far is %d by bidder %s", res.winnerID, res.highest)
+		fmt.Println("Bid is NOT over. The highest bid so far is %s by bidder %d", res.WinnerName, res.Highest)
 	}
 }
 
