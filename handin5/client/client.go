@@ -11,7 +11,6 @@ import (
 	"os"
 	"regexp"
 	"strconv"
-	"time"
 
 	//"strconv"
 	"strings"
@@ -21,9 +20,7 @@ import (
 	gRPC "github.com/Pillsbury42/HastJebalOskw/handin5/gRPC"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/status"
 )
 
 var clientsName = flag.String("name", "default", "Senders name")
@@ -43,8 +40,8 @@ func main() {
 	fmt.Println("--- CLIENT APP ---")
 
 	//log to file instead of console
-	f := setLog()
-	defer f.Close()
+	//f := setLog()
+	//Wdefer f.Close()
 
 	servermap = make(map[int64]string)
 	servermap[1] = "5400"
@@ -73,7 +70,7 @@ func ConnectToServer(port string) error {
 	}
 
 	//dial the server, with the flag "server", to get a connection to it
-	log.Printf("client %s: Attempts to dial on port %s\n", *clientsName, port)
+	fmt.Printf("client %s: Attempts to dial on port %s\n", *clientsName, port)
 	conn, err := grpc.Dial(fmt.Sprintf(":%s", port), opts...)
 	if err != nil {
 		log.Printf("Fail to Dial : %v", err)
@@ -84,7 +81,7 @@ func ConnectToServer(port string) error {
 	// and prints rather or not the connection was is READY
 	server = gRPC.NewAuctionClient(conn)
 	ServerConn = conn
-	log.Println("the connection is: ", conn.GetState().String())
+	fmt.Println("the connection is: ", conn.GetState().String())
 	return nil
 }
 
@@ -106,7 +103,7 @@ func parseInput() {
 
 		if !conReady(server) {
 			log.Printf("Client %s: something was wrong with the connection to the server :(", *clientsName)
-			continue
+			//continue
 		}
 
 		//terminal input parsing here
@@ -138,26 +135,33 @@ func bid(bidamount int64) {
 		BidderName: *clientsName, //change proto
 		Amount:     bidamount,
 	}
-	ctx, timecancel := context.WithTimeout(context.Background(), 2*time.Second)
-	defer timecancel()
+
 	//not sure about this stuff with contextbackground. if it doesn't work, change ctx to context.Background() which is what it was before i messed with it
-	res, err := server.Bid(ctx, msg)
-	if err != nil {
-		if status.Code(err) == codes.DeadlineExceeded {
-			//timeout code here, ie. send to random node
-			for _, value := range servermap {
-				err = ConnectToServer(value)
-				if err == nil {
-					break
-				}
+	res, err := server.Bid(context.Background(), msg)
+	if err != nil || !conReady(server) {
+		ServerConn.Close()
+		//timeout code here, ie. send to random node
+		for _, value := range servermap {
+			err = ConnectToServer(value)
+			if err == nil {
+				break
 			}
-			res, err = server.Bid(ctx, msg)
 		}
+		res, err = server.Bid(context.Background(), msg)
+
 	}
 	//If the leader is a different node from the one that answers, then also change server
+	fmt.Println(res.LeaderID)
+	fmt.Println(leaderID)
 	if res.LeaderID != leaderID {
+		leaderID = res.LeaderID
+		fmt.Println("Wrong leader, closing connection")
+		ServerConn.Close()
+
 		for key, value := range servermap {
+			fmt.Println("Trying another server")
 			if key == leaderID {
+
 				err = ConnectToServer(value)
 				break
 			}
@@ -175,27 +179,32 @@ func bid(bidamount int64) {
 }
 
 func result() {
-	ctx, timecancel := context.WithTimeout(context.Background(), 2*time.Second)
-	defer timecancel()
-	//not sure about this stuff with contextbackground. if it doesn't work, change ctx to context.Background() which is what it was before i messed with it
-	res, err := server.Result(ctx, &gRPC.EmptyMessage{})
-	if err != nil {
-		fmt.Println("Error encountered in client error nil check")
-		fmt.Println(err.Error())
-		if status.Code(err) == codes.DeadlineExceeded {
-			fmt.Println("Deadline exceeded, sending result request to random server")
-			//timeout code here, ie. send to random node
-			for _, value := range servermap {
-				err = ConnectToServer(value)
-				if err == nil {
-					break
-				}
+
+	res, err := server.Result(context.Background(), &gRPC.EmptyMessage{})
+	if err != nil || !conReady(server) {
+		fmt.Println("result error nil entered")
+		//timeout code here, ie. send to random node
+		ServerConn.Close()
+
+		for _, value := range servermap {
+			fmt.Println("Connecting to new server")
+			err = ConnectToServer(value)
+			if err == nil {
+				break
 			}
-			res, err = server.Result(ctx, &gRPC.EmptyMessage{})
+			fmt.Println("Exiting for loop in servermap")
 		}
+		res, err = server.Result(context.Background(), &gRPC.EmptyMessage{})
+		fmt.Println("PRINTING ERROR HERE")
+		fmt.Println(err.Error())
 	}
+
 	//If the leader is a different node from the one that answers, then also change server
+	fmt.Println(leaderID)
+	fmt.Println(res.LeaderID)
 	if res.LeaderID != leaderID {
+		leaderID = res.LeaderID
+		ServerConn.Close()
 		for key, value := range servermap {
 			if key == leaderID {
 				err = ConnectToServer(value)

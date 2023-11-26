@@ -13,9 +13,7 @@ import (
 	// followed by the path to the folder the proto file is in.
 	gRPC "github.com/Pillsbury42/HastJebalOskw/handin5/gRPC"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
-	"google.golang.org/grpc/status"
 )
 
 var isLeader = false
@@ -55,6 +53,7 @@ func main() {
 
 	if *myport == *leaderPort {
 		isLeader = true
+		fmt.Println("I am leader")
 	}
 
 	if *myport == "5400" {
@@ -172,23 +171,20 @@ func (s ImplementedAuctionServer) Bid(ctx context.Context, msg *gRPC.BidMessage)
 			//If the node is not the leader, then it means either that:
 			// the client is not updated on who is the leader, or the leader must have crashed
 			// First, ask the leader yourself
-			ctx, timecancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
-			defer timecancel()
-			ack, err := leader.nodeClient.Bid(ctx, msg)
+			ack, err := leader.nodeClient.Bid(context.Background(), msg)
 			if err != nil {
-				if status.Code(err) == codes.DeadlineExceeded {
-					//timeout code here, ie. election
-					for _, element := range nodeList {
-						if element.nodeId > myID {
-							element.nodeClient.Election(context.Background(), &gRPC.EmptyMessage{})
-						}
+
+				//timeout code here, ie. election
+				for _, element := range nodeList {
+					if element.nodeId > myID {
+						element.nodeClient.Election(context.Background(), &gRPC.EmptyMessage{})
 					}
-					reply = &gRPC.BidReplyMessage{
-						Success:  "Election",
-						LeaderID: leader.nodeId,
-					}
-					return reply, nil
 				}
+				reply = &gRPC.BidReplyMessage{
+					Success:  "Election",
+					LeaderID: leader.nodeId,
+				}
+				return reply, nil
 
 			}
 			//this node is not the leader, but a leader exists
@@ -219,11 +215,9 @@ func (s ImplementedAuctionServer) Result(ctx context.Context, msg *gRPC.EmptyMes
 		if isLeader {
 			return &gRPC.ResultReplyMessage{WinnerName: topBid.bidderName, Highest: topBid.highestBid, LeaderID: myID, Success: "NotOver"}, nil
 		} else {
-			ctx, timecancel := context.WithTimeout(context.Background(), 500*time.Millisecond)
-			defer timecancel()
-			ack, err := leader.nodeClient.Result(ctx, msg)
+			ack, err := leader.nodeClient.Result(context.Background(), msg)
 			if err != nil {
-				if status.Code(err) == codes.DeadlineExceeded {
+				
 					//timeout code here, ie. election
 					for _, element := range nodeList {
 						if element.nodeId > myID {
@@ -232,7 +226,7 @@ func (s ImplementedAuctionServer) Result(ctx context.Context, msg *gRPC.EmptyMes
 					}
 
 					return &gRPC.ResultReplyMessage{LeaderID: leader.nodeId, Success: "Election"}, err
-				}
+				
 			}
 			return ack, err
 		}
