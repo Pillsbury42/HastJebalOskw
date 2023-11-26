@@ -1,1 +1,95 @@
 2023/11/22 12:01:08 client default: Attempts to dial on port 5401
+2023/11/26 18:32:37 client default: Attempts to dial on port 5400
+2023/11/26 18:32:37 the connection is:  READY
+2023/11/26 18:36:55 client default: Attempts to dial on port 5400
+2023/11/26 18:36:55 the connection is:  READY
+2023/11/26 18:41:13 client default: Attempts to dial on port 5400
+2023/11/26 18:41:13 the connection is:  READY
+2023/11/26 18:44:20 client default: Attempts to dial on port 5400
+2023/11/26 18:44:20 the connection is:  READY
+2023/11/26 18:48:01 EOF
+2023/11/26 18:48:04 client default: Attempts to dial on port 5400
+2023/11/26 18:48:04 the connection is:  READY
+2023/11/26 18:50:13 EOF
+2023/11/26 18:50:15 client default: Attempts to dial on port 5400
+2023/11/26 18:50:15 the connection is:  READY
+2023/11/26 18:51:51 EOF
+2023/11/26 18:51:54 client default: Attempts to dial on port 5400
+2023/11/26 18:51:54 the connection is:  READY
+2023/11/26 18:51:57 client default: Attempts to dial on port 5400
+2023/11/26 18:51:57 the connection is:  READY
+2023/11/26 18:52:14 EOF
+2023/11/26 18:52:17 client default: Attempts to dial on port 5400
+2023/11/26 18:52:17 the connection is:  READY
+2023/11/26 18:52:19 client default: Attempts to dial on port 5400
+2023/11/26 18:52:19 the connection is:  READY
+2023/11/26 18:53:32 EOF
+2023/11/26 18:53:35 client default: Attempts to dial on port 5400
+2023/11/26 18:53:35 the connection is:  READY
+2023/11/26 18:53:38 client default: Attempts to dial on port 5400
+2023/11/26 18:53:38 the connection is:  READY
+2023/11/26 18:53:52 EOF
+2023/11/26 18:53:55 client default: Attempts to dial on port 5400
+2023/11/26 18:53:55 the connection is:  READY
+2023/11/26 18:54:10 EOF
+2023/11/26 18:54:13 client default: Attempts to dial on port 5400
+2023/11/26 18:54:13 the connection is:  READY
+2023/11/26 18:55:56 client default: Attempts to dial on port 5400
+2023/11/26 18:55:56 the connection is:  READY
+2023/11/26 18:56:06 client default: Attempts to dial on port 5400
+2023/11/26 18:56:15 the connection is:  READY
+2023/11/26 18:56:19 client default: Attempts to dial on port 5400
+2023/11/26 18:56:19 the connection is:  READY
+2023/11/26 19:09:44 client default: Attempts to dial on port 5400
+2023/11/26 19:09:44 the connection is:  READY
+2023/11/26 19:13:00 client default: Attempts to dial on port 5400
+2023/11/26 19:13:00 the connection is:  READY
+2023/11/26 19:20:53 client default: Attempts to dial on port 5400
+2023/11/26 19:20:53 the connection is:  READY
+2023/11/26 19:30:17 client default: Attempts to dial on port 5400
+2023/11/26 19:30:17 the connection is:  READY
+2023/11/26 19:33:22 client default: Attempts to dial on port 5400
+2023/11/26 19:33:22 the connection is:  READY
+2023/11/26 19:35:13 EOF
+2023/11/26 19:35:16 client default: Attempts to dial on port 5400
+2023/11/26 19:35:16 the connection is:  READY
+2023/11/26 19:37:47 client default: Attempts to dial on port 5400
+2023/11/26 19:37:47 the connection is:  READY
+2023/11/26 19:37:50 client default: Attempts to dial on port 5400
+2023/11/26 19:37:50 the connection is:  READY
+2023/11/26 19:37:58 client default: Attempts to dial on port 5400
+2023/11/26 19:37:58 the connection is:  READY
+2023/11/26 19:38:35 client default: Attempts to dial on port 5400
+2023/11/26 19:38:35 the connection is:  READY
+2023/11/26 19:38:44 client default: Attempts to dial on port 5400
+2023/11/26 19:38:44 the connection is:  READY
+2023/11/26 19:38:52 client default: Attempts to dial on port 5400
+2023/11/26 19:38:52 the connection is:  READY
+2023/11/26 19:39:13 client default: Attempts to dial on port 5400
+2023/11/26 19:39:13 the connection is:  READY
+2023/11/26 19:39:15 EOF
+2023/11/26 19:39:59 EOF
+2023/11/26 19:40:02 client default: Attempts to dial on port 5400
+2023/11/26 19:40:02 the connection is:  READY
+2023/11/26 19:40:14 client default: Attempts to dial on port 5400
+2023/11/26 19:40:14 the connection is:  READY
+2023/11/26 19:40:18 client default: Attempts to dial on port 5400
+2023/11/26 19:40:18 the connection is:  READY
+2023/11/26 19:40:21 client default: Attempts to dial on port 5400
+2023/11/26 19:40:21 the connection is:  READY
+2023/11/26 19:40:23 client default: Attempts to dial on port 5400
+2023/11/26 19:40:23 the connection is:  READY
+2023/11/26 19:43:43 client default: Attempts to dial on port 5400
+2023/11/26 19:43:43 the connection is:  READY
+2023/11/26 19:43:51 client default: Attempts to dial on port 5400
+2023/11/26 19:43:51 the connection is:  READY
+2023/11/26 19:45:42 client default: Attempts to dial on port 5400
+2023/11/26 19:45:42 the connection is:  READY
+2023/11/26 19:45:45 client default: Attempts to dial on port 5400
+2023/11/26 19:45:45 the connection is:  READY
+2023/11/26 19:47:26 client default: Attempts to dial on port 5400
+2023/11/26 19:47:26 the connection is:  READY
+2023/11/26 19:47:30 client default: Attempts to dial on port 5400
+2023/11/26 19:47:30 the connection is:  READY
+2023/11/26 19:47:32 client default: Attempts to dial on port 5400
+2023/11/26 19:47:32 the connection is:  READY

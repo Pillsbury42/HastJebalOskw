@@ -11,13 +11,15 @@ message BidMessage {
 }
 
 message BidReplyMessage {
-    bool success = 1;
+    string success = 1;
+    int64 leaderID = 2;
 }
 
 message ResultReplyMessage {
-    bool over = 1; //is auction over?
     string winnerName = 2; //id of the winner
     int64 highest = 3; //the highest bid
+    int64 leaderID = 4;
+    string success = 1;
 }
 
 message ElectionReplyMessage {

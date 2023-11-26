@@ -2,6 +2,8 @@ package main
 
 import (
 	"bufio"
+
+	//"container/list"
 	"context"
 	"flag"
 	"fmt"
@@ -9,6 +11,7 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"time"
 
 	//"strconv"
 	"strings"
@@ -18,14 +21,20 @@ import (
 	gRPC "github.com/Pillsbury42/HastJebalOskw/handin5/gRPC"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/status"
 )
 
 var clientsName = flag.String("name", "default", "Senders name")
-var serverPort = flag.String("serverp", "5401", "sending port")
+var serverPort = flag.String("serverp", "5400", "sending port")
 
-var server gRPC.AuctionClient //the server
-var ServerConn *grpc.ClientConn  //the server connection
+var server gRPC.AuctionClient   //the server
+var ServerConn *grpc.ClientConn //the server connection
+
+var servermap map[int64]string
+
+var leaderID int64
 
 func main() {
 	//parse flag/arguments
@@ -37,16 +46,23 @@ func main() {
 	f := setLog()
 	defer f.Close()
 
+	servermap = make(map[int64]string)
+	servermap[1] = "5400"
+	servermap[2] = "5401"
+	servermap[3] = "5402"
+
+	leaderID = 1
+
 	//connect to server and close the connection when program closes
 	fmt.Println("--- join Server ---")
-	ConnectToServer()
+	ConnectToServer(*serverPort)
 	defer ServerConn.Close()
 
 	//start the bidding
 	parseInput()
 }
 
-func ConnectToServer() {
+func ConnectToServer(port string) error {
 
 	//dial options
 	//the server is not using TLS, so we use insecure credentials
@@ -57,11 +73,11 @@ func ConnectToServer() {
 	}
 
 	//dial the server, with the flag "server", to get a connection to it
-	log.Printf("client %s: Attempts to dial on port %s\n", *clientsName, *serverPort)
-	conn, err := grpc.Dial(fmt.Sprintf(":%s", *serverPort), opts...)
+	log.Printf("client %s: Attempts to dial on port %s\n", *clientsName, port)
+	conn, err := grpc.Dial(fmt.Sprintf(":%s", port), opts...)
 	if err != nil {
 		log.Printf("Fail to Dial : %v", err)
-		return
+		return err
 	}
 	//fmt.Printf("Error here")
 	// makes a client from the server connection and saves the connection
@@ -69,13 +85,13 @@ func ConnectToServer() {
 	server = gRPC.NewAuctionClient(conn)
 	ServerConn = conn
 	log.Println("the connection is: ", conn.GetState().String())
+	return nil
 }
 
 func parseInput() {
 	reader := bufio.NewReader(os.Stdin)
 	fmt.Println("Type the command you wish to execute below")
 	fmt.Print("Valid commands: bid <value>; result ")
-
 
 	//Infinite loop to listen for clients input.
 	for {
@@ -85,7 +101,8 @@ func parseInput() {
 		if err != nil {
 			log.Fatal(err)
 		}
-	//input = strings.TrimSpace(input) //Trim input
+		//input = strings.TrimSpace(input) //Trim input
+		input = strings.Trim(input, "\r\n")
 
 		if !conReady(server) {
 			log.Printf("Client %s: something was wrong with the connection to the server :(", *clientsName)
@@ -94,10 +111,11 @@ func parseInput() {
 
 		//terminal input parsing here
 		matchresult, err := regexp.MatchString("bid (\\d+)", input)
-		if (input == "result"){
+		fmt.Printf(input)
+		if input == "result" {
 			fmt.Printf("Getting result...")
 			result()
-		} else if (matchresult){
+		} else if matchresult {
 			fmt.Printf("Processing bid...")
 			var splitinput = strings.Split(input, " ")
 			inputint, _ := strconv.Atoi(splitinput[1])
@@ -114,25 +132,83 @@ func parseInput() {
 		}
 	}
 }
-func bid(bidamount int64){
+func bid(bidamount int64) {
+
 	msg := &gRPC.BidMessage{
 		BidderName: *clientsName, //change proto
-		Amount: bidamount,
+		Amount:     bidamount,
 	}
-	res, _ := server.Bid(context.Background(), msg)
-	if (res.Success == true){
+	ctx, timecancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer timecancel()
+	//not sure about this stuff with contextbackground. if it doesn't work, change ctx to context.Background() which is what it was before i messed with it
+	res, err := server.Bid(ctx, msg)
+	if err != nil {
+		if status.Code(err) == codes.DeadlineExceeded {
+			//timeout code here, ie. send to random node
+			for _, value := range servermap {
+				err = ConnectToServer(value)
+				if err == nil {
+					break
+				}
+			}
+			res, err = server.Bid(ctx, msg)
+		}
+	}
+	//If the leader is a different node from the one that answers, then also change server
+	if res.LeaderID != leaderID {
+		for key, value := range servermap {
+			if key == leaderID {
+				err = ConnectToServer(value)
+				break
+			}
+		}
+	}
+	if res.Success == "Success" {
 		fmt.Println("Bid completed. You are now the highest bidder.")
-	} else {
-		fmt.Println("Bid failed.")
-	} 
+	} else if res.Success == "LowBid" {
+		fmt.Println("Bid failed as it was too low.")
+	} else if res.Success == "Over" {
+		fmt.Println("Bid failed as the auction is over.")
+	} else if res.Success == "Election" {
+		fmt.Println("An error occured while bidding. Please try again.")
+	}
 }
 
-func result(){
-	res, _ := server.Result(context.Background(), &gRPC.EmptyMessage{})
-	if (res.Over) {
-		fmt.Println("Bid is over. The highest bid was %s by bidder %d", res.WinnerName, res.Highest)
-	} else {
-		fmt.Println("Bid is NOT over. The highest bid so far is %s by bidder %d", res.WinnerName, res.Highest)
+func result() {
+	ctx, timecancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer timecancel()
+	//not sure about this stuff with contextbackground. if it doesn't work, change ctx to context.Background() which is what it was before i messed with it
+	res, err := server.Result(ctx, &gRPC.EmptyMessage{})
+	if err != nil {
+		fmt.Println("Error encountered in client error nil check")
+		fmt.Println(err.Error())
+		if status.Code(err) == codes.DeadlineExceeded {
+			fmt.Println("Deadline exceeded, sending result request to random server")
+			//timeout code here, ie. send to random node
+			for _, value := range servermap {
+				err = ConnectToServer(value)
+				if err == nil {
+					break
+				}
+			}
+			res, err = server.Result(ctx, &gRPC.EmptyMessage{})
+		}
+	}
+	//If the leader is a different node from the one that answers, then also change server
+	if res.LeaderID != leaderID {
+		for key, value := range servermap {
+			if key == leaderID {
+				err = ConnectToServer(value)
+				break
+			}
+		}
+	}
+	if res.Success == "Over" {
+		fmt.Printf("Auction is over. The highest bid was %s by bidder %d", res.WinnerName, res.Highest)
+	} else if res.Success == "NotOver" {
+		fmt.Printf("Auction is NOT over. The highest bid so far is %s by bidder %d", res.WinnerName, res.Highest)
+	} else if res.Success == "Election" {
+		fmt.Println("An error occured while requesting results. Please try again.")
 	}
 }
 
