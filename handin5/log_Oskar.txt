@@ -8,3 +8,5 @@
 2023/11/26 19:40:27 client Oskar: Attempts to dial on port 5400
 2023/11/26 19:40:27 the connection is:  READY
 2023/11/26 19:43:27 EOF
+2023/11/26 19:43:46 client Oskar: Attempts to dial on port 5400
+2023/11/26 19:43:46 the connection is:  READY
