@@ -40,8 +40,8 @@ func main() {
 	fmt.Println("--- CLIENT APP ---")
 
 	//log to file instead of console
-	//f := setLog()
-	//Wdefer f.Close()
+	f := setLog()
+	defer f.Close()
 
 	servermap = make(map[int64]string)
 	servermap[1] = "5400"
@@ -65,15 +65,15 @@ func ConnectToServer(port string) error {
 	//the server is not using TLS, so we use insecure credentials
 	//(should be fine for local testing but not in the real world)
 	opts := []grpc.DialOption{
-		grpc.WithBlock(),
+		//grpc.WithBlock(),
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	}
 
 	//dial the server, with the flag "server", to get a connection to it
-	fmt.Printf("client %s: Attempts to dial on port %s\n", *clientsName, port)
+	log.Printf("client %s: Attempts to dial on port %s\n", *clientsName, port)
 	conn, err := grpc.Dial(fmt.Sprintf(":%s", port), opts...)
 	if err != nil {
-		log.Printf("Fail to Dial : %v", err)
+		log.Println("Fail to Dial : %v", err)
 		return err
 	}
 	//fmt.Printf("Error here")
@@ -81,7 +81,7 @@ func ConnectToServer(port string) error {
 	// and prints rather or not the connection was is READY
 	server = gRPC.NewAuctionClient(conn)
 	ServerConn = conn
-	fmt.Println("the connection is: ", conn.GetState().String())
+	log.Println("the connection is: ", conn.GetState().String())
 	return nil
 }
 
@@ -102,7 +102,7 @@ func parseInput() {
 		input = strings.Trim(input, "\r\n")
 
 		if !conReady(server) {
-			log.Printf("Client %s: something was wrong with the connection to the server :(", *clientsName)
+			log.Println("Client %s: something was wrong with the connection to the server :(", *clientsName)
 			//continue
 		}
 
@@ -110,10 +110,10 @@ func parseInput() {
 		matchresult, err := regexp.MatchString("bid (\\d+)", input)
 		fmt.Printf(input)
 		if input == "result" {
-			fmt.Printf("Getting result...")
+			fmt.Println("Getting result...")
 			result()
 		} else if matchresult {
-			fmt.Printf("Processing bid...")
+			fmt.Println("Processing bid...")
 			var splitinput = strings.Split(input, " ")
 			inputint, _ := strconv.Atoi(splitinput[1])
 			in := int64(inputint)
@@ -140,10 +140,12 @@ func bid(bidamount int64) {
 	res, err := server.Bid(context.Background(), msg)
 	if err != nil || !conReady(server) {
 		ServerConn.Close()
+		delete(servermap, leaderID)
 		//timeout code here, ie. send to random node
-		for _, value := range servermap {
+		for key, value := range servermap {
 			err = ConnectToServer(value)
 			if err == nil {
+				leaderID = key
 				break
 			}
 		}
@@ -151,15 +153,14 @@ func bid(bidamount int64) {
 
 	}
 	//If the leader is a different node from the one that answers, then also change server
-	fmt.Println(res.LeaderID)
-	fmt.Println(leaderID)
+	
 	if res.LeaderID != leaderID {
 		leaderID = res.LeaderID
-		fmt.Println("Wrong leader, closing connection")
+		log.Println("Wrong leader, closing connection")
 		ServerConn.Close()
 
 		for key, value := range servermap {
-			fmt.Println("Trying another server")
+			log.Println("Trying another server")
 			if key == leaderID {
 
 				err = ConnectToServer(value)
@@ -182,26 +183,23 @@ func result() {
 
 	res, err := server.Result(context.Background(), &gRPC.EmptyMessage{})
 	if err != nil || !conReady(server) {
-		fmt.Println("result error nil entered")
+		delete(servermap, leaderID)
 		//timeout code here, ie. send to random node
 		ServerConn.Close()
 
-		for _, value := range servermap {
-			fmt.Println("Connecting to new server")
+		for key, value := range servermap {
+			log.Println("Connecting to new server")
 			err = ConnectToServer(value)
 			if err == nil {
+				leaderID = key
 				break
 			}
-			fmt.Println("Exiting for loop in servermap")
 		}
 		res, err = server.Result(context.Background(), &gRPC.EmptyMessage{})
-		fmt.Println("PRINTING ERROR HERE")
-		fmt.Println(err.Error())
+
 	}
 
 	//If the leader is a different node from the one that answers, then also change server
-	fmt.Println(leaderID)
-	fmt.Println(res.LeaderID)
 	if res.LeaderID != leaderID {
 		leaderID = res.LeaderID
 		ServerConn.Close()
@@ -213,9 +211,9 @@ func result() {
 		}
 	}
 	if res.Success == "Over" {
-		fmt.Printf("Auction is over. The highest bid was %s by bidder %d", res.WinnerName, res.Highest)
+		fmt.Printf("Auction is over. The highest bid was %d by bidder %s", res.Highest, res.WinnerName)
 	} else if res.Success == "NotOver" {
-		fmt.Printf("Auction is NOT over. The highest bid so far is %s by bidder %d", res.WinnerName, res.Highest)
+		fmt.Printf("Auction is NOT over. The highest bid so far is %d by bidder %s", res.Highest, res.WinnerName)
 	} else if res.Success == "Election" {
 		fmt.Println("An error occured while requesting results. Please try again.")
 	}
